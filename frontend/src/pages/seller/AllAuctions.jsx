@@ -217,7 +217,7 @@ function AllAuctions() {
     };
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('nb-NO', {
+        return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
             day: 'numeric'
@@ -426,10 +426,10 @@ function AllAuctions() {
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className="py-4 px-6 text-sm text-gray-900">${auction.startPrice?.toLocaleString('nb-NO')}</td>
+                                                    <td className="py-4 px-6 text-sm text-gray-900">${auction.startPrice?.toLocaleString('en-US')}</td>
                                                     <td className="py-4 px-6 text-sm font-medium text-green-600">
-                                                        {/* ${auction.currentPrice?.toLocaleString('nb-NO')} */}
-                                                        {auction.bids?.length > 0 ? auction.currentPrice?.toLocaleString('nb-NO') : 'No Bids'}
+                                                        {/* ${auction.currentPrice?.toLocaleString('en-US')} */}
+                                                        {auction.bids?.length > 0 ? auction.currentPrice?.toLocaleString('en-US') : 'No Bids'}
                                                     </td>
                                                     <td className="py-4 px-6 text-sm text-gray-900">
                                                         <div className="flex items-center">

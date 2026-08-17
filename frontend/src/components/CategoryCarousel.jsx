@@ -1,25 +1,61 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useKeenSlider } from "keen-slider/react";
-import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Tractor, Building2, Trees, Truck, Wrench, Package, Leaf, Warehouse, Cog } from "lucide-react";
+import {
+    ChevronLeft,
+    ChevronRight,
+    Package,
+    ArrowUpRight,
+    Shirt,
+    Trophy,
+    CircleDot,
+    Sparkles,
+} from "lucide-react";
 import "keen-slider/keen-slider.min.css";
 
-// Map category names to icons (fallback)
+// ============================================================
+// CATEGORY ICON FALLBACK
+// ============================================================
+
 const getCategoryIcon = (categoryName) => {
-    const name = categoryName?.toLowerCase() || '';
-    if (name.includes('agriculture') || name.includes('tractor')) return Tractor;
-    if (name.includes('construction') || name.includes('building')) return Building2;
-    if (name.includes('forestry') || name.includes('tree')) return Trees;
-    if (name.includes('transport') || name.includes('truck')) return Truck;
-    if (name.includes('ground') || name.includes('lawn')) return Wrench;
-    if (name.includes('material') || name.includes('handling')) return Package;
-    if (name.includes('spray') || name.includes('irrigation')) return Leaf;
-    if (name.includes('spare') || name.includes('parts')) return Cog;
-    if (name.includes('storage') || name.includes('silo')) return Warehouse;
-    return Package; // default icon
+    const name = categoryName?.toLowerCase() || "";
+
+    if (
+        name.includes("sports") ||
+        name.includes("sport") ||
+        name.includes("card")
+    ) {
+        return Trophy;
+    }
+
+    if (
+        name.includes("jersey") ||
+        name.includes("shirt") ||
+        name.includes("apparel")
+    ) {
+        return Shirt;
+    }
+
+    if (
+        name.includes("ball") ||
+        name.includes("game")
+    ) {
+        return CircleDot;
+    }
+
+    if (
+        name.includes("memorabilia") ||
+        name.includes("collectible")
+    ) {
+        return Sparkles;
+    }
+
+    return Package;
 };
 
-function CategoryCarousel({ categories = [], onCategoryClick }) {
+function CategoryCarousel({
+    categories = [],
+    onCategoryClick,
+}) {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [loaded, setLoaded] = useState(false);
 
@@ -27,101 +63,240 @@ function CategoryCarousel({ categories = [], onCategoryClick }) {
         slideChanged(slider) {
             setCurrentSlide(slider.track.details.rel);
         },
+
         created() {
             setLoaded(true);
         },
-        slides: { perView: 1, spacing: 16 },
-        breakpoints: {
-            "(min-width: 640px)": { slides: { perView: 2, spacing: 16 } },
-            "(min-width: 768px)": { slides: { perView: 3, spacing: 16 } },
-            "(min-width: 1024px)": { slides: { perView: 4, spacing: 20 } },
-            "(min-width: 1280px)": { slides: { perView: 5, spacing: 20 } },
+
+        slides: {
+            perView: 1.15,
+            spacing: 14,
         },
+
+        breakpoints: {
+            "(min-width: 640px)": {
+                slides: {
+                    perView: 2,
+                    spacing: 16,
+                },
+            },
+
+            "(min-width: 768px)": {
+                slides: {
+                    perView: 3,
+                    spacing: 18,
+                },
+            },
+
+            "(min-width: 1024px)": {
+                slides: {
+                    perView: 4,
+                    spacing: 20,
+                },
+            },
+
+            "(min-width: 1280px)": {
+                slides: {
+                    perView: 5,
+                    spacing: 20,
+                },
+            },
+        },
+
         loop: categories.length > 5,
     });
 
-    // autoplay
+    // ============================================================
+    // AUTOPLAY
+    // ============================================================
+
     useEffect(() => {
-        if (!instanceRef.current || categories.length <= 5) return;
-        const interval = setInterval(() => instanceRef.current?.next(), 4500);
+        if (!instanceRef.current || categories.length <= 5) {
+            return;
+        }
+
+        const interval = setInterval(() => {
+            instanceRef.current?.next();
+        }, 5000);
+
         return () => clearInterval(interval);
     }, [instanceRef, categories.length]);
 
-    // Don't render if no categories
+    // ============================================================
+    // EMPTY STATE
+    // ============================================================
+
     if (!categories || categories.length === 0) {
         return (
-            <div className="text-center py-12 bg-gray-50 rounded-lg">
-                <Package size={48} className="mx-auto text-gray-300 mb-4" />
-                <h3 className="text-lg font-medium text-gray-700">No categories available</h3>
+            <div className="rounded-3xl border border-gray-100 bg-gray-50 py-16 text-center">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-sm">
+                    <Package
+                        size={25}
+                        className="text-gray-300"
+                    />
+                </div>
+
+                <h3 className="mt-5 text-base font-semibold text-gray-700">
+                    No categories available
+                </h3>
+
+                <p className="mt-1 text-sm text-gray-400">
+                    Check back soon for new collections.
+                </p>
             </div>
         );
     }
 
+    // ============================================================
+    // MAIN
+    // ============================================================
+
     return (
         <div className="relative">
-            {/* arrows - only show if more than 5 categories */}
-            {loaded && instanceRef.current && categories.length > 5 && (
-                <>
-                    <button
-                        onClick={() => instanceRef.current?.prev()}
-                        className="absolute left-0 top-1/2 -translate-y-1/2 -ml-4 bg-white shadow-md rounded-full p-2 hover:scale-105 transition z-10"
-                        aria-label="Previous"
-                    >
-                        <ChevronLeft size={20} />
-                    </button>
-                    <button
-                        onClick={() => instanceRef.current?.next()}
-                        className="absolute right-0 top-1/2 -translate-y-1/2 -mr-4 bg-white shadow-md rounded-full p-2 hover:scale-105 transition z-10"
-                        aria-label="Next"
-                    >
-                        <ChevronRight size={20} />
-                    </button>
-                </>
-            )}
 
-            {/* slider */}
-            <div ref={sliderRef} className="keen-slider">
+            {/* =====================================================
+                NAVIGATION ARROWS
+            ====================================================== */}
+
+            {loaded &&
+                instanceRef.current &&
+                categories.length > 5 && (
+                    <>
+                        <button
+                            type="button"
+                            onClick={() =>
+                                instanceRef.current?.prev()
+                            }
+                            className="group absolute -left-4 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-gray-100 bg-white shadow-[0_8px_30px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-x-1 hover:border-[#C59D55]/30 hover:text-[#A17B35] sm:flex"
+                            aria-label="Previous categories"
+                        >
+                            <ChevronLeft
+                                size={19}
+                                className="transition-transform group-hover:-translate-x-0.5"
+                            />
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() =>
+                                instanceRef.current?.next()
+                            }
+                            className="group absolute -right-4 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-gray-100 bg-white shadow-[0_8px_30px_rgba(0,0,0,0.1)] transition-all duration-300 hover:translate-x-1 hover:border-[#C59D55]/30 hover:text-[#A17B35] sm:flex"
+                            aria-label="Next categories"
+                        >
+                            <ChevronRight
+                                size={19}
+                                className="transition-transform group-hover:translate-x-0.5"
+                            />
+                        </button>
+                    </>
+                )}
+
+            {/* =====================================================
+                SLIDER
+            ====================================================== */}
+
+            <div
+                ref={sliderRef}
+                className="keen-slider"
+            >
                 {categories.map((category) => {
                     const Icon = getCategoryIcon(category.name);
-                    // Use the image from API if available, otherwise fallback to placeholder
-                    const imageUrl = category.image || `https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=800&auto=format&fit=crop`;
+
+                    const imageUrl =
+                        category.image ||
+                        "https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=1200&auto=format&fit=crop";
+
+                    const iconUrl =
+                        category.icon ||
+                        "https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=1200&auto=format&fit=crop";
 
                     return (
-                        <div key={category.slug || category._id} className="keen-slider__slide">
+                        <div
+                            key={category.slug || category._id}
+                            className="keen-slider__slide"
+                        >
                             <button
-                                onClick={() => onCategoryClick(category.slug)}
-                                className="w-full focus:outline-none"
+                                type="button"
+                                onClick={() =>
+                                    onCategoryClick(category.slug)
+                                }
+                                className="group block w-full text-left focus:outline-none"
                             >
-                                <div className="relative h-52 rounded-xl overflow-hidden group cursor-pointer will-change-transform">
-                                    {/* Background Image */}
+                                <div className="relative h-[290px] overflow-hidden rounded-[22px] bg-gray-100">
+
+                                    {/* =================================================
+                                        IMAGE
+                                    ================================================== */}
+
                                     <div
-                                        className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-110"
-                                        style={{ backgroundImage: `url(${imageUrl})` }}
+                                        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+                                        style={{
+                                            backgroundImage: `url(${imageUrl})`,
+                                        }}
                                     />
 
-                                    {/* Dark overlay */}
-                                    <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition duration-300 pointer-events-none" />
+                                    {/* Image contrast */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-black/5 transition-all duration-500 group-hover:from-black/85" />
 
-                                    {/* Hover Icon */}
-                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                        <div className="bg-orange-500 rounded-full p-4 shadow-lg
-                                            opacity-0 scale-75
-                                            group-hover:opacity-100 group-hover:scale-100
-                                            transition duration-300 ease-out">
-                                            <Icon size={28} className="text-white" />
-                                        </div>
+                                    {/* Subtle gold glow */}
+                                    <div className="absolute inset-0 bg-gradient-to-br from-[#C59D55]/0 via-transparent to-[#C59D55]/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
+                                    {/* =================================================
+                                        TOP CATEGORY ICON
+                                    ================================================== */}
+
+                                    <div className="absolute left-5 top-5 flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-black/25 text-white/80 backdrop-blur-md transition-all duration-500 group-hover:border-[#C59D55]/40 group-hover:bg-[#C59D55] group-hover:text-[#111]">
+                                        {iconUrl ? (
+                                            <img
+                                                src={iconUrl}
+                                                alt={category.name}
+                                                className="h-7 w-7 invert object-cover"
+                                            />
+                                        ) : (
+                                            <Icon size={18} />
+                                        )}
                                     </div>
 
-                                    {/* Bottom Label */}
-                                    <div className="absolute bottom-5 left-1/2 -translate-x-1/2 pointer-events-none w-full px-4">
-                                        <h3 className="font-semibold text-white text-center text-lg drop-shadow-lg">
-                                            {category.name}
-                                        </h3>
-                                        {category.auctionCount > 0 && (
-                                            <p className="text-xs text-white/90 text-center mt-1">
-                                                {category.auctionCount.toLocaleString()} auctions
-                                            </p>
-                                        )}
+                                    {/* =================================================
+                                        ARROW
+                                    ================================================== */}
+
+                                    <div className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/20 text-white/70 opacity-0 backdrop-blur-md transition-all duration-500 group-hover:translate-x-0 group-hover:opacity-100">
+                                        <ArrowUpRight size={16} />
+                                    </div>
+
+                                    {/* =================================================
+                                        CONTENT
+                                    ================================================== */}
+
+                                    <div className="absolute bottom-0 left-0 right-0 p-5">
+
+                                        <div className="flex items-end justify-between gap-3">
+
+                                            <div>
+                                                <h3 className="text-lg font-bold tracking-tight text-white">
+                                                    {category.name}
+                                                </h3>
+
+                                                {category.auctionCount > 0 && (
+                                                    <div className="mt-2 inline-flex items-center rounded-full border border-white/10 bg-white/10 px-2.5 py-1 backdrop-blur-md">
+                                                        <span className="text-[10px] font-medium text-white/75">
+                                                            {category.auctionCount.toLocaleString()}{" "}
+                                                            auctions
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Small arrow */}
+                                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-black transition-all duration-500 group-hover:bg-[#C59D55]">
+                                                <ArrowUpRight size={16} />
+                                            </div>
+                                        </div>
+
+                                        {/* Gold underline */}
+                                        <div className="mt-4 h-[2px] w-0 bg-[#C59D55] transition-all duration-500 group-hover:w-full" />
                                     </div>
                                 </div>
                             </button>
@@ -130,25 +305,40 @@ function CategoryCarousel({ categories = [], onCategoryClick }) {
                 })}
             </div>
 
-            {/* Dots Navigation */}
-            {loaded && instanceRef.current && categories.length > 5 && (
-                <div className="flex justify-center mt-6 gap-2">
-                    {[
-                        ...Array(instanceRef.current.track.details.slides.length).keys(),
-                    ].map((idx) => (
-                        <button
-                            key={idx}
-                            onClick={() => instanceRef.current?.moveToIdx(idx)}
-                            className={`w-2 h-2 rounded-full transition-all ${
-                                currentSlide === idx 
-                                    ? 'bg-orange-500 w-6' 
-                                    : 'bg-gray-300 hover:bg-gray-400'
-                            }`}
-                            aria-label={`Go to slide ${idx + 1}`}
-                        />
-                    ))}
-                </div>
-            )}
+            {/* =====================================================
+                DOT NAVIGATION
+            ====================================================== */}
+
+            {loaded &&
+                instanceRef.current &&
+                categories.length > 5 && (
+                    <div className="mt-7 flex items-center justify-center gap-1.5">
+                        {Array.from(
+                            {
+                                length:
+                                    instanceRef.current.track.details.slides
+                                        .length,
+                            },
+                            (_, idx) => idx
+                        ).map((idx) => (
+                            <button
+                                key={idx}
+                                type="button"
+                                onClick={() =>
+                                    instanceRef.current?.moveToIdx(
+                                        idx
+                                    )
+                                }
+                                className={`h-1.5 rounded-full transition-all duration-300 ${currentSlide === idx
+                                    ? "w-7 bg-[#C59D55]"
+                                    : "w-1.5 bg-gray-200 hover:bg-gray-300"
+                                    }`}
+                                aria-label={`Go to category slide ${idx + 1
+                                    }`}
+                            />
+                        ))}
+                    </div>
+                )}
         </div>
     );
 }

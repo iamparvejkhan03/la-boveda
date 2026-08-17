@@ -104,23 +104,23 @@ function BidHistory() {
     };
 
     const formatTime = (dateString) => {
-        return new Date(dateString).toLocaleTimeString('nb-NO', {
+        return new Date(dateString).toLocaleTimeString('en-US', {
             hour: '2-digit',
             minute: '2-digit'
         });
     };
 
     const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('nb-NO', {
+        return new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: 'NOK',
+            currency: 'USD',
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         }).format(amount);
     };
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('nb-NO', {
+        return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
@@ -201,7 +201,7 @@ function BidHistory() {
                             <p className="text-gray-600 mb-4">{error}</p>
                             <button
                                 onClick={fetchSellerAuctions}
-                                className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600"
+                                className="bg-[#C59D55] text-white px-4 py-2 rounded-lg hover:bg-[#C59D55]/90"
                             >
                                 Try Again
                             </button>

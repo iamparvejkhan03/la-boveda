@@ -5,27 +5,20 @@ import { otherData } from "../assets";
 const { phone, email, address } = otherData;
 
 const TermsOfUse = () => {
-    const currentDate = new Date();
-    const formattedDate = currentDate.toLocaleDateString('nb-NO', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-    });
-
     return (
         <section className="pt-28 pb-16 bg-white">
             <Container>
                 {/* Header */}
                 <div className="max-w-full mx-auto mb-10">
                     <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Terms of Use</h1>
-                    <p className="text-gray-600 mb-6">BidNordic | Last Updated: {formattedDate}</p>
-                    
+                    <p className="text-gray-600 mb-6">La-Bóveda | Last Updated: August 9, 2026</p>
+
                     <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
                         <p className="text-red-800 font-semibold mb-2">IMPORTANT – PLEASE READ</p>
                         <p className="text-red-700 text-sm">
-                            These Terms govern your use of BidNordic. By registering or using our platform, 
-                            you confirm your agreement to these Terms. All equipment is sold on a "sold as seen" 
-                            trade basis without warranty unless otherwise stated.
+                            These Terms govern your use of La-Bóveda. By registering or using our platform,
+                            you confirm your agreement to these Terms. All collectibles are sold on an "as-is"
+                            basis without warranty unless otherwise stated.
                         </p>
                     </div>
                 </div>
@@ -36,8 +29,9 @@ const TermsOfUse = () => {
                         {/* Introduction */}
                         <div className="mb-8">
                             <p className="text-gray-700 mb-4">
-                                <strong>BidNordic</strong> ("we", "our", "us") operates an online marketplace for heavy 
-                                equipment and industrial machinery. These Terms of Use ("Terms") govern your access to and use 
+                                <strong>La-Bóveda</strong> ("we", "our", "us") operates an online marketplace for sports
+                                and non-sports collectibles, including cards, signed jerseys, game-used balls, and other
+                                valuable memorabilia. These Terms of Use ("Terms") govern your access to and use
                                 of our website, platform, and services.
                             </p>
                             <p className="text-gray-700">
@@ -49,10 +43,10 @@ const TermsOfUse = () => {
                         <div className="border-t pt-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-3">1. Platform Access</h2>
                             <ul className="text-gray-700 space-y-2 list-disc pl-5">
-                                <li>BidNordic is open to both trade professionals and private buyers</li>
+                                <li>La-Bóveda is open to both collectors and private buyers</li>
                                 <li>All users must register and maintain accurate account information</li>
                                 <li>We reserve the right to refuse or terminate access at our discretion</li>
-                                <li>Users must comply with all applicable Swedish and EU laws</li>
+                                <li>Users must comply with all applicable laws</li>
                             </ul>
                         </div>
 
@@ -61,9 +55,9 @@ const TermsOfUse = () => {
                             <h2 className="text-xl font-bold text-gray-900 mb-3">2. Account Registration</h2>
                             <ul className="text-gray-700 space-y-2 list-disc pl-5">
                                 <li>Registration is free</li>
-                                <li>You must provide accurate and complete information</li>
+                                <li>You must provide accurate and complete information, including your email address, phone number, address, ID number, and a photo of yourself and your ID</li>
                                 <li>You are responsible for maintaining account security</li>
-                                <li>We may suspend or terminate accounts for misuse or non-payment</li>
+                                <li>We may suspend or terminate accounts for misuse or violation of these Terms</li>
                                 <li>Account sharing or transferring is prohibited without consent</li>
                             </ul>
                         </div>
@@ -71,28 +65,27 @@ const TermsOfUse = () => {
                         {/* Section 3 - Our Role */}
                         <div className="border-t pt-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-3">3. Our Role</h2>
-                            <p className="text-gray-700 mb-3">BidNordic may act as:</p>
+                            <p className="text-gray-700 mb-3">La-Bóveda acts as:</p>
                             <ul className="text-gray-700 space-y-2 list-disc pl-5 mb-3">
-                                <li><strong>Principal:</strong> Selling equipment we own directly</li>
                                 <li><strong>Intermediary:</strong> Facilitating sales between third-party sellers and buyers</li>
                             </ul>
                             <div className="bg-gray-50 p-4 rounded">
                                 <p className="text-gray-700 font-semibold">
-                                    In all cases, BidNordic manages the transaction and issues the invoice.
+                                    In all cases, La-Bóveda manages the transaction, collects payment, and releases funds to the seller.
                                 </p>
                             </div>
                         </div>
 
                         {/* Section 4 - Transactions */}
                         <div className="border-t pt-6">
-                            <h2 className="text-xl font-bold text-gray-900 mb-3">4. Auctions, Offers & Buy Now</h2>
+                            <h2 className="text-xl font-bold text-gray-900 mb-3">4. Auctions & Direct Purchases</h2>
                             <div className="bg-red-50 p-4 rounded mb-3">
                                 <p className="text-red-700 font-semibold mb-2">LEGALLY BINDING COMMITMENTS</p>
                                 <ul className="text-red-700 space-y-1 list-disc pl-5">
-                                    <li>All bids, offers, and Buy Now purchases are legally binding contracts</li>
+                                    <li>All bids are legally binding contracts</li>
                                     <li>Bid retractions are not permitted</li>
+                                    <li>Direct purchases are binding upon confirmation</li>
                                     <li>Failure to complete payment constitutes a breach of contract</li>
-                                    <li>Giveaway entries are subject to separate terms displayed with each promotion</li>
                                 </ul>
                             </div>
                         </div>
@@ -101,9 +94,8 @@ const TermsOfUse = () => {
                         <div className="border-t pt-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-3">5. Buyer Fees</h2>
                             <p className="text-gray-700">
-                                A minimal buyer fee applies to successful purchases. The fee amount is clearly displayed 
-                                before you bid, make an offer, or complete a Buy Now purchase. All fees are in NOK unless 
-                                otherwise stated.
+                                A 5% buyer's fee applies to all successful purchases. The fee is clearly displayed
+                                before you bid or complete a purchase. All fees are in USD unless otherwise stated.
                             </p>
                         </div>
 
@@ -111,8 +103,8 @@ const TermsOfUse = () => {
                         <div className="border-t pt-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-3">6. Seller Fees</h2>
                             <p className="text-gray-700">
-                                Sellers may be charged commission-based or fixed fees. Fee structures are agreed upon 
-                                during the onboarding process. Sellers are responsible for managing their own listings, 
+                                Sellers are charged a 5% commission on the final sale price. There are no listing fees,
+                                photography fees, or hidden charges. Sellers are responsible for creating their own listings,
                                 including descriptions and images.
                             </p>
                         </div>
@@ -121,10 +113,11 @@ const TermsOfUse = () => {
                         <div className="border-t pt-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-3">7. Payments</h2>
                             <ul className="text-gray-700 space-y-2 list-disc pl-5">
-                                <li>Bank transfer is the primary payment method</li>
-                                <li>Payment terms vary by listing – check each auction or sale for deadlines</li>
-                                <li>Equipment will not be released until payment clears in full</li>
-                                <li>All payments must be made in NOK</li>
+                                <li>Bank transfer in USD is the only accepted payment method</li>
+                                <li>Payment must be completed within 48 hours of winning an auction or confirming a direct purchase</li>
+                                <li>All payments must be made to the La-Bóveda collection account</li>
+                                <li>Items will not be released until payment clears in full</li>
+                                <li>Once payment is verified, we release funds to the seller</li>
                             </ul>
                         </div>
 
@@ -132,11 +125,10 @@ const TermsOfUse = () => {
                         <div className="border-t pt-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-3">8. Collection & Delivery</h2>
                             <ul className="text-gray-700 space-y-2 list-disc pl-5">
-                                <li>Collection is available by appointment only</li>
-                                <li>Please contact us at least 24 hours in advance to arrange collection</li>
-                                <li>Delivery can be arranged across Norway at additional cost</li>
-                                <li>Quotes for delivery are provided before dispatch</li>
-                                <li>Risk transfers to buyer upon collection or delivery</li>
+                                <li>Buyer and seller are responsible for arranging and managing delivery between themselves</li>
+                                <li>Collection can be arranged directly with the seller after payment is confirmed</li>
+                                <li>Risk transfers to the buyer upon collection or delivery, whichever occurs first</li>
+                                <li>Tracking or shipping labels can be uploaded through our secure communication window</li>
                             </ul>
                         </div>
 
@@ -144,16 +136,17 @@ const TermsOfUse = () => {
                         <div className="border-t pt-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-3">9. Sold As Seen – No Warranty</h2>
                             <div className="bg-yellow-50 p-4 rounded mb-3">
-                                <p className="text-red-600 font-bold text-center mb-2">ALL EQUIPMENT IS SOLD:</p>
+                                <p className="text-red-600 font-bold text-center mb-2">ALL COLLECTIBLES ARE SOLD:</p>
                                 <div className="text-center space-y-1">
-                                    <p className="text-red-600">As seen / "i befintligt skick"</p>
+                                    <p className="text-red-600">As-is / "en el estado en que se encuentran"</p>
                                     <p className="text-red-600">Without any warranty</p>
-                                    <p className="text-red-600">Without consumer rights</p>
+                                    <p className="text-red-600">Without consumer rights protections</p>
                                 </div>
                             </div>
                             <p className="text-gray-700">
-                                Equipment descriptions are provided for guidance only. Buyers are encouraged to ask questions 
-                                before bidding or purchasing. We are here to help with any inquiries.
+                                Item descriptions and photographs are provided for guidance only. Buyers are encouraged to ask questions
+                                before bidding or purchasing through our secure communication window. La-Bóveda is a marketplace and
+                                does not guarantee condition beyond what is described.
                             </p>
                         </div>
 
@@ -162,60 +155,69 @@ const TermsOfUse = () => {
                             <h2 className="text-xl font-bold text-gray-900 mb-3">10. Inspections & Returns</h2>
                             <ul className="text-gray-700 space-y-2 list-disc pl-5">
                                 <li>On-site inspections are not available before bidding</li>
-                                <li>If you have concerns after winning, please contact us immediately</li>
-                                <li>Returns are not automatically accepted – we review concerns case by case</li>
-                                <li>All sales are final unless otherwise agreed in writing</li>
+                                <li>All sales are final</li>
+                                <li>If you have concerns after winning, please contact us directly and we'll review your situation</li>
                             </ul>
                         </div>
 
-                        {/* Section 11 - Title & Risk */}
+                        {/* Section 11 - Communication Rules */}
                         <div className="border-t pt-6">
-                            <h2 className="text-xl font-bold text-gray-900 mb-3">11. Title & Risk</h2>
+                            <h2 className="text-xl font-bold text-gray-900 mb-3">11. Communication Rules</h2>
                             <ul className="text-gray-700 space-y-2 list-disc pl-5">
-                                <li>Legal title and ownership pass only when full payment is received</li>
-                                <li>Risk of loss or damage transfers to buyer upon collection or delivery</li>
-                                <li>Buyers are responsible for insurance from the moment of collection/delivery</li>
+                                <li>All communication between buyers and sellers must go through the La-Bóveda platform</li>
+                                <li>Sharing personal contact information (phone numbers, email addresses, physical addresses, etc.) is strictly prohibited</li>
+                                <li>Only tracking or shipping labels may be shared through the secure communication window</li>
+                                <li>Off-platform communication may result in account suspension</li>
                             </ul>
                         </div>
 
-                        {/* Section 12 - Default & Enforcement */}
+                        {/* Section 12 - Title & Risk */}
                         <div className="border-t pt-6">
-                            <h2 className="text-xl font-bold text-gray-900 mb-3">12. Default & Enforcement</h2>
+                            <h2 className="text-xl font-bold text-gray-900 mb-3">12. Title & Risk</h2>
+                            <ul className="text-gray-700 space-y-2 list-disc pl-5">
+                                <li>Legal title and ownership pass only when full payment is received and confirmed</li>
+                                <li>Risk of loss or damage transfers to the buyer upon collection or delivery</li>
+                                <li>Buyers are responsible for insurance from the moment of collection or delivery</li>
+                            </ul>
+                        </div>
+
+                        {/* Section 13 - Default & Enforcement */}
+                        <div className="border-t pt-6">
+                            <h2 className="text-xl font-bold text-gray-900 mb-3">13. Default & Enforcement</h2>
                             <p className="text-gray-700 mb-2">If payment is not completed, we may:</p>
                             <ul className="text-gray-700 space-y-2 list-disc pl-5">
-                                <li>Cancel the sale and relist the equipment</li>
+                                <li>Cancel the sale and relist the item</li>
                                 <li>Seek recovery of any losses or costs incurred</li>
                                 <li>Suspend or permanently terminate the user's account</li>
                                 <li>Report to relevant authorities if fraud is suspected</li>
                             </ul>
                         </div>
 
-                        {/* Section 13 - Limitation of Liability */}
+                        {/* Section 14 - Limitation of Liability */}
                         <div className="border-t pt-6">
-                            <h2 className="text-xl font-bold text-gray-900 mb-3">13. Limitation of Liability</h2>
+                            <h2 className="text-xl font-bold text-gray-900 mb-3">14. Limitation of Liability</h2>
                             <p className="text-gray-700">
-                                To the extent permitted by Swedish law, BidNordic's total liability is limited to the 
-                                purchase price of the equipment in question. We are not liable for indirect or consequential 
+                                To the extent permitted by law, La-Bóveda's total liability is limited to the
+                                purchase price of the collectible in question. We are not liable for indirect or consequential
                                 losses. This does not limit liability for fraud, death, or personal injury caused by negligence.
                             </p>
                         </div>
 
-                        {/* Section 14 - Governing Law */}
+                        {/* Section 15 - Governing Law */}
                         <div className="border-t pt-6">
-                            <h2 className="text-xl font-bold text-gray-900 mb-3">14. Governing Law & Disputes</h2>
+                            <h2 className="text-xl font-bold text-gray-900 mb-3">15. Governing Law & Disputes</h2>
                             <ul className="text-gray-700 space-y-2 list-disc pl-5">
-                                <li>These Terms are governed by the laws of Norway</li>
-                                <li>Disputes shall be resolved by the courts of Norway</li>
-                                <li>BidNordic is located in {address}</li>
+                                <li>These Terms are governed by the laws of Venezuela</li>
+                                <li>Disputes shall be resolved by the courts of Venezuela</li>
                             </ul>
                         </div>
 
-                        {/* Section 15 - Changes to Terms */}
+                        {/* Section 16 - Changes to Terms */}
                         <div className="border-t pt-6">
-                            <h2 className="text-xl font-bold text-gray-900 mb-3">15. Changes to These Terms</h2>
+                            <h2 className="text-xl font-bold text-gray-900 mb-3">16. Changes to These Terms</h2>
                             <p className="text-gray-700">
-                                We may update these Terms from time to time. The "Last Updated" date indicates the most 
-                                recent version. Material changes will be communicated via email or platform notice. 
+                                We may update these Terms from time to time. The "Last Updated" date indicates the most
+                                recent version. Material changes will be communicated via email or platform notice.
                                 Continued use after changes constitutes acceptance.
                             </p>
                         </div>
@@ -224,8 +226,7 @@ const TermsOfUse = () => {
                         <div className="border-t pt-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-4">Contact Information</h2>
                             <div className="bg-gray-50 p-4 rounded">
-                                <p className="font-semibold text-gray-900 mb-2">BidNordic</p>
-                                <p className="text-gray-700 text-sm mb-1">{address}</p>
+                                <p className="font-semibold text-gray-900 mb-2">La-Bóveda</p>
                                 <p className="text-gray-700 text-sm mb-1">
                                     Email: <a href={`mailto:${email}`} className="text-blue-600 hover:underline break-all">{email}</a>
                                 </p>
@@ -238,7 +239,7 @@ const TermsOfUse = () => {
                         {/* Footer Note */}
                         <div className="border-t pt-6 mt-8">
                             <p className="text-gray-500 text-sm">
-                                These Terms were last updated on {formattedDate}. If you have questions about these Terms, 
+                                These Terms were last updated on August 9, 2026. If you have questions about these Terms,
                                 please contact us at {email}.
                             </p>
                         </div>
@@ -247,14 +248,14 @@ const TermsOfUse = () => {
                     {/* Navigation Links */}
                     <div className="mt-12 pt-8 border-t">
                         <div className="flex flex-wrap gap-3">
-                            <Link 
-                                to="/privacy-policy" 
+                            <Link
+                                to="/privacy-policy"
                                 className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded text-sm font-medium transition-colors"
                             >
                                 Privacy Policy
                             </Link>
-                            <Link 
-                                to="/buyer-agreement" 
+                            <Link
+                                to="/buyer-agreement"
                                 className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded text-sm font-medium transition-colors"
                             >
                                 Buyer Agreement

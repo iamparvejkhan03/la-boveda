@@ -151,23 +151,23 @@ function BidHistory() {
     };
 
     const formatTime = (dateString) => {
-        return new Date(dateString).toLocaleTimeString('nb-NO', {
+        return new Date(dateString).toLocaleTimeString('en-US', {
             hour: '2-digit',
             minute: '2-digit'
         });
     };
 
     const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('nb-NO', {
+        return new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: 'NOK',
+            currency: 'USD',
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         }).format(amount);
     };
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('nb-NO', {
+        return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
@@ -207,14 +207,14 @@ function BidHistory() {
     const statCards = [
         {
             title: "Total Bids",
-            value: stats.totalBids?.toLocaleString('nb-NO') || "0",
+            value: stats.totalBids?.toLocaleString('en-US') || "0",
             change: "All Time",
             icon: <Gavel size={24} />,
             color: "blue"
         },
         {
             title: "Recent Bids",
-            value: stats.recentBids?.toLocaleString('nb-NO') || "0",
+            value: stats.recentBids?.toLocaleString('en-US') || "0",
             change: "Last 7 Days",
             icon: <TrendingUp size={24} />,
             color: "green"
@@ -228,7 +228,7 @@ function BidHistory() {
         // },
         {
             title: "Active Bidders",
-            value: stats.activeBidders?.toLocaleString('nb-NO') || "0",
+            value: stats.activeBidders?.toLocaleString('en-US') || "0",
             change: "Last 30 Days",
             icon: <Users size={24} />,
             color: "orange"

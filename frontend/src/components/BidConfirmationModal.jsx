@@ -44,9 +44,9 @@ const BidConfirmationModal = forwardRef((props, ref) => {
 
     if (!isOpen) return null;
 
-    const formatNOK = (amount) => {
-        if (!amount && amount !== 0) return "0 kr";
-        return `${Number(amount).toLocaleString("nb-NO")} kr`;
+    const formatUSD = (amount) => {
+        if (!amount && amount !== 0) return "$0";
+        return `$${Number(amount).toLocaleString("en-US")}`;
     };
 
     const total = Number(bidAmount) + Number(serviceFee);
@@ -83,19 +83,19 @@ const BidConfirmationModal = forwardRef((props, ref) => {
                             <tr>
                                 <td className="text-gray-600">Bid Amount:</td>
                                 <td className="text-right text-gray-900">
-                                    {formatNOK(bidAmount)}
+                                    {formatUSD(bidAmount)}
                                 </td>
                             </tr>
                             <tr>
                                 <td className="py-2 text-gray-600">Service Fee:</td>
                                 <td className="py-2 text-right text-gray-900">
-                                    {formatNOK(serviceFee)}
+                                    {formatUSD(serviceFee)}
                                 </td>
                             </tr>
                             <tr className="border-t border-gray-200">
                                 <td className="py-3 font-semibold text-gray-900">Total:</td>
                                 <td className="py-3 text-right font-semibold text-gray-900">
-                                    {formatNOK(total)}
+                                    {formatUSD(total)}
                                 </td>
                             </tr>
                         </tbody>

@@ -145,16 +145,16 @@ function MyBids() {
     };
 
     const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('nb-NO', {
+        return new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: 'NOK',
+            currency: 'USD',
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         }).format(amount);
     };
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('nb-NO', {
+        return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
@@ -189,7 +189,7 @@ function MyBids() {
                             <p className="text-red-600">{error}</p>
                             <button
                                 onClick={fetchMyBids}
-                                className="mt-4 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600"
+                                className="mt-4 bg-[#C59D55] text-white px-4 py-2 rounded-lg hover:bg-[#C59D55]/90"
                             >
                                 Try Again
                             </button>
@@ -324,7 +324,7 @@ function MyBids() {
                                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${filter === "winning" ? "bg-green-100 text-green-800 border border-green-200 shadow-lg" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
                             >
                                 <Award size={14} className="inline mr-1" />
-                                Winning ({statistics.totalWinning?.toLocaleString('nb-NO')})
+                                Winning ({statistics.totalWinning?.toLocaleString('en-US')})
                             </button>
                             <button
                                 onClick={() => setFilter("outbid")}
@@ -338,7 +338,7 @@ function MyBids() {
                                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${filter === "won" ? "bg-blue-100 text-blue-800 border border-blue-200 shadow-lg" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
                             >
                                 <CheckCircle size={14} className="inline mr-1" />
-                                Won ({statistics.totalWon?.toLocaleString('nb-NO')})
+                                Won ({statistics.totalWon?.toLocaleString('en-US')})
                             </button>
                         </div>
                     </div>
@@ -469,7 +469,7 @@ function MyBids() {
                                             setFilter("all");
                                             setSearchTerm("");
                                         }}
-                                        className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors"
+                                        className="bg-[#C59D55] hover:bg-[#C59D55]/90 text-white px-6 py-2 rounded-lg transition-colors"
                                     >
                                         Clear Filters
                                     </button>
@@ -491,16 +491,16 @@ function MyBids() {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                                 <div>
                                     <p className="text-sm text-gray-600">Total Bids Placed</p>
-                                    <p className="text-2xl font-bold text-gray-900">{statistics.totalBids?.toLocaleString('nb-NO')}</p>
+                                    <p className="text-2xl font-bold text-gray-900">{statistics.totalBids?.toLocaleString('en-US')}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-600">Active Participation</p>
-                                    <p className="text-2xl font-bold text-green-600">{statistics.totalActiveBids?.toLocaleString('nb-NO')}</p>
+                                    <p className="text-2xl font-bold text-green-600">{statistics.totalActiveBids?.toLocaleString('en-US')}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-600">Success Rate</p>
                                     <p className="text-2xl font-bold text-blue-600">
-                                        {statistics.successRate?.toLocaleString('nb-NO')}%
+                                        {statistics.successRate?.toLocaleString('en-US')}%
                                     </p>
                                 </div>
                             </div>

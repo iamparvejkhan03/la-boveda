@@ -17,6 +17,9 @@ import contactQueryRouter from "./routes/contactQuery.route.js";
 import offerRouter from "./routes/offer.route.js";
 import buyNowRouter from "./routes/buyNow.route.js";
 import categoryRouter from "./routes/category.route.js";
+import communicationRouter from "./routes/communication.route.js";
+import payoutRouter from "./routes/payout.route.js";
+import paymentRouter from "./routes/payment.route.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -42,7 +45,7 @@ app.use(express.json({ limit: '16kb' }));
 app.use(express.urlencoded({ limit: '16kb' }));
 
 app.use(cors({
-    origin: ['https://www.bidnordic.com', 'https://bidnordic.com', 'https://bidnordic-frontend.onrender.com', 'http://localhost:5173'],
+    origin: ['https://www.la-boveda.com', 'https://la-boveda.com', 'https://la-boveda-frontend.onrender.com', 'https://la-boveda-backend.onrender.com', 'http://localhost:5173', 'http://localhost:3000'],
     credentials: true,
 }));
 
@@ -68,6 +71,9 @@ app.use('/api/v1/offers', offerRouter);
 app.use('/api/v1/buy-now', buyNowRouter);
 // app.use('/api/v1/admin/categories', categoryRouter);
 app.use('/api/v1/categories', categoryRouter);
+app.use("/api/v1/communication", communicationRouter);
+app.use("/api/v1/payouts", payoutRouter);
+app.use('/api/v1/payments', paymentRouter);
 
 // 404 handler - SIMPLIFIED VERSION
 app.use((req, res, next) => {

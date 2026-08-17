@@ -6,7 +6,7 @@ const BidHistory = ({ bids, auction }) => {
     if (!timestamp) return 'Unknown time';
 
     const date = new Date(timestamp);
-    return new Intl.DateTimeFormat('nb-NO', {
+    return new Intl.DateTimeFormat('en-US', {
       month: '2-digit',
       day: '2-digit',
       year: 'numeric',
@@ -126,7 +126,7 @@ const BidHistory = ({ bids, auction }) => {
                         isCurrentHighest ? 'text-blue-600' :
                           'text-primary'
                       }`}>
-                      {bid.amount.toLocaleString()} kr
+                      ${bid.amount.toLocaleString()}
                     </span>
                   </td>
                 </tr>
@@ -144,12 +144,12 @@ const BidHistory = ({ bids, auction }) => {
           </div>
 
           <div className="flex items-center gap-2">
-            <span>Highest Bid: <strong className="text-primary">{highestBid.toLocaleString()} kr</strong></span>
+            <span>Highest Bid: <strong className="text-primary">${highestBid.toLocaleString()}</strong></span>
           </div>
 
           {auction && auction.bidCount > 0 && (
             <div className="flex items-center gap-2">
-              <span>Bid Increment: <strong className="text-primary">{auction.bidIncrement.toLocaleString()} kr</strong></span>
+              <span>Bid Increment: <strong className="text-primary">${auction.bidIncrement.toLocaleString()}</strong></span>
             </div>
           )}
         </div>

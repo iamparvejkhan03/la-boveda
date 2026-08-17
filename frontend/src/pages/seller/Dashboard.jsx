@@ -25,11 +25,11 @@ function Dashboard() {
     const statsData = [
         {
             title: "Total Revenue",
-            value: stats?.totalRevenue?.toLocaleString('nb-NO'),
+            value: stats?.totalRevenue?.toLocaleString('en-US'),
             change: "All Time",
             icon: <DollarSign size={24} />,
             trend: "up",
-            currency: " kr"
+            currency: "$"
         },
         {
             title: "Active Auctions",
@@ -62,11 +62,11 @@ function Dashboard() {
         },
         {
             title: "Avg. Sale Price",
-            value: stats?.avgSalePrice?.toLocaleString('nb-NO'),
+            value: stats?.avgSalePrice?.toLocaleString('en-US'),
             change: "Per Item Sold",
             icon: <DollarSign size={24} />,
             trend: "up",
-            currency: " kr"
+            currency: "$"
         },
         {
             title: "Watchlist Items",

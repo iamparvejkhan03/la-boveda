@@ -263,7 +263,7 @@ const FiltersSection = ({
 
                 {/* Price Range */}
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Price Range (kr)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Price Range</label>
                     <div className="flex gap-2">
                         <input
                             type="number"
@@ -317,8 +317,6 @@ const FiltersSection = ({
                             <option value="">All Types</option>
                             <option value="standard">Standard Auction</option>
                             <option value="reserve">Reserve Auction</option>
-                            <option value="buy_now">Buy Now Auction</option>
-                            <option value="giveaway">Free Giveaway</option>
                         </select>
                     </div>
 
@@ -648,8 +646,13 @@ function Auctions() {
                 {/* Header */}
                 <div className="bg-white border-b border-gray-200 px-8 py-8">
                     <div className="container mx-auto">
-                        <h1 className="text-3xl font-bold text-gray-900">All Auctions</h1>
-                        <p className="text-gray-600 mt-2">Browse through our selection of premium machinery and equipment across all categories.</p>
+                        <h2 className="text-4xl font-black tracking-[-0.04em] text-gray-950 md:text-5xl">
+                                All
+                                <span className="ml-2 font-medium italic text-gray-400">
+                                    Auctions.
+                                </span>
+                            </h2>
+                        <p className="text-gray-600 mt-2">Browse through our selection of premium collectibles across all categories.</p>
                     </div>
                 </div>
 
@@ -710,7 +713,7 @@ function Auctions() {
 
                                 <div className="flex items-center gap-3">
                                     {/* Add view mode toggle */}
-                                    <div className="hidden md:flex items-center gap-2 bg-gray-100 p-1 rounded-lg">
+                                    {/* <div className="hidden md:flex items-center gap-2 bg-gray-100 p-1 rounded-lg">
                                         <button
                                             onClick={() => setViewMode("grid")}
                                             className={`p-2 rounded transition-colors ${viewMode === "grid" ? "bg-white shadow-sm" : "hover:bg-gray-200"}`}
@@ -725,7 +728,7 @@ function Auctions() {
                                         >
                                             <List size={18} className={viewMode === "list" ? "text-orange-500" : "text-gray-500"} />
                                         </button>
-                                    </div>
+                                    </div> */}
 
                                     <div className="flex items-center gap-2">
                                         <span className="text-gray-600 text-sm">Sort by:</span>

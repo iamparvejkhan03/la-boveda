@@ -26,21 +26,21 @@ function ActiveAuctions() {
     const auctionStats = [
         {
             title: "Active Auctions",
-            value: stats.activeAuctions?.toLocaleString('nb-NO'),
+            value: stats.activeAuctions?.toLocaleString('en-US'),
             change: "All Time",
             icon: <Gavel size={24} />,
             trend: "up"
         },
         {
             title: "New Today",
-            value: stats.newToday?.toLocaleString('nb-NO'),
+            value: stats.newToday?.toLocaleString('en-US'),
             change: "In Last 24 Hours",
             icon: <Award size={24} />,
             trend: "up"
         },
         {
             title: "Ending Soon",
-            value: stats.endingSoon?.toLocaleString('nb-NO'),
+            value: stats.endingSoon?.toLocaleString('en-US'),
             change: "In Next 24 Hours",
             icon: <Clock size={24} />,
             trend: "down",
@@ -334,7 +334,7 @@ function ActiveAuctions() {
                                     setSearchTerm("");
                                     setCategoryFilter("all");
                                 }}
-                                className="bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white hover:from-orange-500 hover:via-orange-600 hover:to-orange-700 px-6 py-2 rounded-lg transition-colors"
+                                className="bg-[#C59D55] text-white hover:bg-[#C59D55]/90 px-6 py-2 rounded-lg transition-colors"
                             >
                                 Clear All Filters
                             </button>

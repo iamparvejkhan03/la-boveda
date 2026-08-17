@@ -31,42 +31,42 @@ function Dashboard() {
     const statsData = [
         // {
         //     title: "Currently Winning Auctions",
-        //     value: stats?.currentlyWinning?.toLocaleString('nb-NO'),
+        //     value: stats?.currentlyWinning?.toLocaleString('en-US'),
         //     change: "Leading In Auctions",
         //     icon: <Hand size={24} />,
         //     trend: "up"
         // },
         {
             title: "Active Bids",
-            value: stats?.activeBids?.toLocaleString('nb-NO'),
+            value: stats?.activeBids?.toLocaleString('en-US'),
             change: "On Live Auctions",
             icon: <Gavel size={24} />,
             trend: "up"
         },
         // {
         //     title: "Total Offers",
-        //     value: stats?.totalOffers?.toLocaleString('nb-NO'),
+        //     value: stats?.totalOffers?.toLocaleString('en-US'),
         //     change: "On Live Auctions",
         //     icon: <Hand size={24} />,
         //     trend: "up"
         // },
         {
             title: "Active Offers",
-            value: stats?.activeOffers?.toLocaleString('nb-NO'),
+            value: stats?.activeOffers?.toLocaleString('en-US'),
             change: "On Live Auctions",
             icon: <Hand size={24} />,
             trend: "up"
         },
         {
             title: "Total Auctions",
-            value: stats?.totalParticipatedAuctions?.toLocaleString('nb-NO'),
+            value: stats?.totalParticipatedAuctions?.toLocaleString('en-US'),
             change: "All Time",
             icon: <Hand size={24} />,
             trend: "up"
         },
         {
             title: "Auctions Won",
-            value: stats?.wonAuctions?.toLocaleString('nb-NO'),
+            value: stats?.wonAuctions?.toLocaleString('en-US'),
             change: "No. of Won Auctions",
             icon: <Award size={24} />,
             trend: "up"
@@ -81,31 +81,31 @@ function Dashboard() {
         // }, 
         // {
         //     title: "Total Spent",
-        //     value: stats?.totalSpent?.toLocaleString('nb-NO'),
+        //     value: stats?.totalSpent?.toLocaleString('en-US'),
         //     change: "Used To Purchase",
         //     icon: <Banknote size={24} />,
         //     trend: "up",
-        //     currency: " kr"
+        //     currency: "$"
         // },
         // {
         //     title: "Average Bid Amount",
-        //     value: stats?.avgBidAmount?.toLocaleString('nb-NO'),
+        //     value: stats?.avgBidAmount?.toLocaleString('en-US'),
         //     change: "Bid Amount / No. of Bids",
         //     icon: <Banknote size={24} />,
         //     trend: "up",
-        //     currency: " kr"
+        //     currency: "$"
         // },
         // {
-        //     title: "Avg. Offer kr",
-        //     value: stats?.avgOfferAmount?.toLocaleString('nb-NO'),
+        //     title: "Avg. Offer $",
+        //     value: stats?.avgOfferAmount?.toLocaleString('en-US'),
         //     change: "Bid Amount / No. of Bids",
         //     icon: <Banknote size={24} />,
         //     trend: "up",
-        //     currency: " kr"
+        //     currency: "$"
         // },
         {
             title: "Watchlist Items",
-            value: stats?.watchlistCount?.toLocaleString('nb-NO'),
+            value: stats?.watchlistCount?.toLocaleString('en-US'),
             change: "Saved For Later",
             icon: <Bookmark size={24} />,
             trend: "up"

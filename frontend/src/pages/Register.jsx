@@ -486,7 +486,7 @@ const Register = () => {
                                         className="hidden"
                                         onChange={() => handleUserTypeChange('bidder')}
                                     />
-                                    <Gavel size={40} className={`flex-shrink-0 p-2 rounded ${userType === 'bidder' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'
+                                    <Gavel size={40} className={`flex-shrink-0 p-2 rounded ${userType === 'bidder' ? 'bg-[#C59D55] text-white' : 'bg-gray-200 text-gray-600'
                                         }`} />
                                     <div>
                                         <p className="text-sm font-semibold">I'm a bidder</p>
@@ -505,30 +505,11 @@ const Register = () => {
                                         className="hidden"
                                         onChange={() => handleUserTypeChange('seller')}
                                     />
-                                    <Store size={40} className={`flex-shrink-0 p-2 rounded ${userType === 'seller' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'
+                                    <Store size={40} className={`flex-shrink-0 p-2 rounded ${userType === 'seller' ? 'bg-[#C59D55] text-white' : 'bg-gray-200 text-gray-600'
                                         }`} />
                                     <div>
                                         <p className="text-sm font-semibold">I'm a seller</p>
                                         <p className="text-sm text-gray-600">I want to list things on the platform.</p>
-                                    </div>
-                                </label>
-
-                                <label
-                                    className={`flex items-center gap-5 border py-3 px-5 rounded cursor-pointer transition-colors ${userType === 'broker' ? 'border-primary bg-blue-50' : 'border-gray-200 hover:border-gray-300'
-                                        }`}
-                                >
-                                    <input
-                                        type="radio"
-                                        value="broker"
-                                        {...register('userType', { required: 'Please select user type' })}
-                                        className="hidden"
-                                        onChange={() => handleUserTypeChange('broker')}
-                                    />
-                                    <Handshake size={40} className={`flex-shrink-0 p-2 rounded ${userType === 'broker' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'
-                                        }`} />
-                                    <div>
-                                        <p className="text-sm font-semibold">I'm a broker</p>
-                                        <p className="text-sm text-gray-600">I want to list things on behalf of others.</p>
                                     </div>
                                 </label>
                             </div>
@@ -544,7 +525,7 @@ const Register = () => {
                                     {...register('termsConditions', { required: 'Accepting terms of use is required for registration.' })}
                                 />
 
-                                <p className="text-sm text-gray-600">By registering, I agree to BidNordic's <Link className='text-blue-600 underline' to={`/terms-of-use`}>Terms of Use</Link>. My information will be used as described in the <Link to={`/privacy-policy`} className='text-blue-600 underline'>Privacy Policy</Link>.</p>
+                                <p className="text-sm text-gray-600">By registering, I agree to La-Boveda's <Link className='text-blue-600 underline' to={`/terms-of-use`}>Terms of Use</Link>. My information will be used as described in the <Link to={`/privacy-policy`} className='text-blue-600 underline'>Privacy Policy</Link>.</p>
                             </label>
                             {errors.termsConditions && (
                                 <p className="text-red-500 text-sm mt-1">{errors.termsConditions.message}</p>
@@ -555,7 +536,7 @@ const Register = () => {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-500 hover:via-amber-600 hover:to-amber-700 text-white py-3 px-4 rounded-lg font-semibold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+                            className="w-full bg-[#C59D55] hover:bg-[#D8B96F] text-white py-3 px-4 rounded-lg font-semibold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
                         >
                             {isLoading ? 'Creating account...' : 'Create Account'}
                         </button>
@@ -575,7 +556,7 @@ const Register = () => {
                 {/* Footer */}
                 <div className="bg-white px-4 pb-4 text-center">
                     <p className="text-xs text-gray-500">
-                        © {new Date().getFullYear()} BidNordic. All rights reserved.
+                        © {new Date().getFullYear()} La-Boveda. All rights reserved.
                     </p>
                 </div>
             </div>

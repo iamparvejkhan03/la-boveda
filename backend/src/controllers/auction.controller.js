@@ -1810,7 +1810,7 @@ export const getBiddingStats = async (req, res) => {
 export const getWonAuctions = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { page = 1, limit = 12, status, search } = req.query;
+    const { page = 1, limit = 100, status, search } = req.query;
 
     // Build filter for auctions won by user
     const filter = {
@@ -1864,6 +1864,7 @@ export const getWonAuctions = async (req, res) => {
       yourMaxBid: getMaxBidForUser(auction.bids, userId),
       winningBid: auction.finalPrice || auction.currentPrice,
       bids: auction.bidCount,
+      commissionAmount: auction.commissionAmount,
 
       // Buy Now Info
       buyNowPrice: auction.buyNowPrice,
@@ -1884,19 +1885,19 @@ export const getWonAuctions = async (req, res) => {
       hasInvoice: !!(auction.invoice && auction.invoice.url),
       invoice: auction.invoice
         ? {
-            url: auction.invoice.url,
-            filename: auction.invoice.filename,
-            uploadedAt: auction.invoice.uploadedAt,
-            uploadedBy: auction.invoice.uploadedBy
-              ? {
-                  _id: auction.invoice.uploadedBy._id.toString(),
-                  name:
-                    auction.invoice.uploadedBy.name ||
-                    auction.invoice.uploadedBy.username,
-                  email: auction.invoice.uploadedBy.email,
-                }
-              : null,
-          }
+          url: auction.invoice.url,
+          filename: auction.invoice.filename,
+          uploadedAt: auction.invoice.uploadedAt,
+          uploadedBy: auction.invoice.uploadedBy
+            ? {
+              _id: auction.invoice.uploadedBy._id.toString(),
+              name:
+                auction.invoice.uploadedBy.name ||
+                auction.invoice.uploadedBy.username,
+              email: auction.invoice.uploadedBy.email,
+            }
+            : null,
+        }
         : null,
 
       // Status & Timing
@@ -1930,14 +1931,14 @@ export const getWonAuctions = async (req, res) => {
       // Winner Info (if sold)
       winner: auction.winner
         ? {
-            _id: auction.winner._id.toString(),
-            name:
-              auction.winner.firstName && auction.winner.lastName
-                ? `${auction.winner.firstName} ${auction.winner.lastName}`
-                : auction.winner.username,
-            username: auction.winner.username,
-            email: auction.winner.email,
-          }
+          _id: auction.winner._id.toString(),
+          name:
+            auction.winner.firstName && auction.winner.lastName
+              ? `${auction.winner.firstName} ${auction.winner.lastName}`
+              : auction.winner.username,
+          username: auction.winner.username,
+          email: auction.winner.email,
+        }
         : null,
 
       // Messages
@@ -1953,9 +1954,9 @@ export const getWonAuctions = async (req, res) => {
       // Current bidder info
       currentBidder: auction.currentBidder
         ? {
-            _id: auction.currentBidder._id.toString(),
-            name: auction.currentBidder.name || auction.currentBidder.username,
-          }
+          _id: auction.currentBidder._id.toString(),
+          name: auction.currentBidder.name || auction.currentBidder.username,
+        }
         : null,
     }));
 
@@ -1968,11 +1969,11 @@ export const getWonAuctions = async (req, res) => {
     const averageSavings =
       auctions.length > 0
         ? auctions.reduce(
-            (sum, auction) =>
-              sum +
-              auction.startPrice / (auction.finalPrice || auction.currentPrice),
-            0,
-          ) / auctions.length
+          (sum, auction) =>
+            sum +
+            auction.startPrice / (auction.finalPrice || auction.currentPrice),
+          0,
+        ) / auctions.length
         : 0;
 
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -2135,30 +2136,30 @@ export const getSoldAuctions = async (req, res) => {
         endTime: auction.endDate,
         winner: auction.winner
           ? {
-              id: auction.winner._id.toString(),
-              name:
-                auction.winner.firstName && auction.winner.lastName
-                  ? `${auction.winner.firstName} ${auction.winner.lastName}`
-                  : auction.winner.username,
-              username: auction.winner.username,
-              email: auction.winner.email,
-              image: auction.winner.image,
-              phone: auction.winner.phone,
-              company: auction.winner.company,
-              address: auction.winner.address,
-              ip: "Not Available", // IP might not be stored
-              bidHistory: auction.bids
-                .filter(
-                  (bid) =>
-                    bid.bidder?._id?.toString() ===
-                    auction.winner?._id?.toString(),
-                )
-                .map((bid) => ({
-                  amount: bid.amount,
-                  time: bid.timestamp,
-                }))
-                .sort((a, b) => new Date(a.time) - new Date(b.time)),
-            }
+            id: auction.winner._id.toString(),
+            name:
+              auction.winner.firstName && auction.winner.lastName
+                ? `${auction.winner.firstName} ${auction.winner.lastName}`
+                : auction.winner.username,
+            username: auction.winner.username,
+            email: auction.winner.email,
+            image: auction.winner.image,
+            phone: auction.winner.phone,
+            company: auction.winner.company,
+            address: auction.winner.address,
+            ip: "Not Available", // IP might not be stored
+            bidHistory: auction.bids
+              .filter(
+                (bid) =>
+                  bid.bidder?._id?.toString() ===
+                  auction.winner?._id?.toString(),
+              )
+              .map((bid) => ({
+                amount: bid.amount,
+                time: bid.timestamp,
+              }))
+              .sort((a, b) => new Date(a.time) - new Date(b.time)),
+          }
           : null,
         bidders: sortedBidders.filter(
           (bidder) =>
@@ -2544,6 +2545,90 @@ export const getAuctionCommission = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to fetch commission info",
+    });
+  }
+};
+
+// Get a single "hot listing" based on weighted score (bidCount * currentPrice)
+export const getHotListing = async (req, res) => {
+  try {
+    const now = new Date();
+
+    // Build filter for active listings (status active, endDate in future)
+    const filter = {
+      status: "active",
+      endDate: { $gt: now },
+    };
+
+    // Optional: add category filter if provided
+    if (req.query.category && req.query.category !== "all") {
+      filter.categories = req.query.category;
+    }
+
+    // Find all active listings matching filter
+    let listings = await Auction.find(filter)
+      .populate("seller", "username companyName firstName lastName location")
+      .populate("currentBidder", "username companyName firstName")
+      .lean(); // use lean for performance
+
+    if (!listings.length) {
+      // Fallback 1: try ended but sold listings (for demo/empty state)
+      listings = await Auction.find({ status: "approved" })
+        .populate("seller", "username companyName firstName lastName location")
+        .populate("winner", "username companyName firstName")
+        .sort({ finalPrice: -1 })
+        .limit(1)
+        .lean();
+
+      if (!listings.length) {
+        return res.status(404).json({
+          success: false,
+          message: "No active listings found to feature as hot listing",
+        });
+      }
+
+      // Convert the fallback auction
+      const fallbackAuction = listings[0];
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          auction: {
+            ...fallbackAuction,
+          },
+          note: "No active listings available – showing recent sold item.",
+        },
+      });
+    }
+
+    // Calculate weighted score using converted current price for fair comparison
+    const scoredListings = listings.map((listing) => {
+      const hotScore = (listing.bidCount + 1) * listing.currentPrice;
+
+      return {
+        ...listing,
+        hotScore,
+      };
+    });
+
+    // Sort by hotScore descending
+    scoredListings.sort((a, b) => b.hotScore - a.hotScore);
+
+    // Pick the top one
+    const hotListing = scoredListings[0];
+
+    res.status(200).json({
+      success: true,
+      data: {
+        auction: hotListing,
+        score: hotListing.hotScore,
+      },
+    });
+  } catch (error) {
+    console.error("Get hot listing error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error while fetching hot listing",
     });
   }
 };

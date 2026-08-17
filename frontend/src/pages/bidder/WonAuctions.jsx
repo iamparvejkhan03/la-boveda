@@ -12,9 +12,159 @@ import {
     TrendingUp,
     SortAsc,
     Banknote,
+    Loader,
+    Info,
+    Copy,
+    Check,
+    X,
 } from "lucide-react";
 import axiosInstance from "../../utils/axiosInstance";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
+
+// Bank Transfer Details Component
+const BankTransferDetails = ({ bankDetails, onCopy, handleBankTransfer, onClose, selectedAuction }) => {
+    const [copiedField, setCopiedField] = useState(null);
+
+    const handleCopy = (text, field) => {
+        navigator.clipboard.writeText(text);
+        setCopiedField(field);
+        onCopy?.(field);
+        setTimeout(() => setCopiedField(null), 2000);
+    };
+
+    if (!bankDetails) return null;
+
+    return (
+        <div className="bg-gradient-to-br relative from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 mt-28 sm:mt-0">
+            <h4 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                <Banknote size={20} className="text-blue-600" />
+                Bank Transfer Details
+            </h4>
+
+            <X size={20} onClick={() => onClose(false)} className="cursor-pointer absolute top-7 right-7 text-gray-600" />
+
+            <div className="space-y-4 grid grid-cols-1 sm:grid-cols-2">
+                {bankDetails.accountHolderName && (
+                    <div className="flex items-center justify-between bg-white p-3 rounded-lg">
+                        <div>
+                            <p className="text-xs text-gray-500">Account Holder</p>
+                            <p className="font-medium">{bankDetails.accountHolderName}</p>
+                        </div>
+                        <button
+                            onClick={() => handleCopy(bankDetails.accountHolderName, 'holder')}
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                            {copiedField === 'holder' ? <Check size={16} className="text-green-600" /> : <Copy size={16} className="text-gray-500" />}
+                        </button>
+                    </div>
+                )}
+
+                {bankDetails.bankName && (
+                    <div className="flex items-center justify-between bg-white p-3 rounded-lg">
+                        <div>
+                            <p className="text-xs text-gray-500">Bank Name</p>
+                            <p className="font-medium">{bankDetails.bankName}</p>
+                        </div>
+                        <button
+                            onClick={() => handleCopy(bankDetails.bankName, 'bank')}
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                            {copiedField === 'bank' ? <Check size={16} className="text-green-600" /> : <Copy size={16} className="text-gray-500" />}
+                        </button>
+                    </div>
+                )}
+
+                {bankDetails.accountNumber && (
+                    <div className="flex items-center justify-between bg-white p-3 rounded-lg">
+                        <div>
+                            <p className="text-xs text-gray-500">Account Number</p>
+                            <p className="font-medium font-mono">{bankDetails.accountNumber}</p>
+                        </div>
+                        <button
+                            onClick={() => handleCopy(bankDetails.accountNumber, 'account')}
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                            {copiedField === 'account' ? <Check size={16} className="text-green-600" /> : <Copy size={16} className="text-gray-500" />}
+                        </button>
+                    </div>
+                )}
+
+                {bankDetails.routingNumber && (
+                    <div className="flex items-center justify-between bg-white p-3 rounded-lg">
+                        <div>
+                            <p className="text-xs text-gray-500">Routing Number</p>
+                            <p className="font-medium font-mono">{bankDetails.routingNumber}</p>
+                        </div>
+                        <button
+                            onClick={() => handleCopy(bankDetails.routingNumber, 'routing')}
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                            {copiedField === 'routing' ? <Check size={16} className="text-green-600" /> : <Copy size={16} className="text-gray-500" />}
+                        </button>
+                    </div>
+                )}
+
+                {bankDetails.iban && (
+                    <div className="flex items-center justify-between bg-white p-3 rounded-lg">
+                        <div>
+                            <p className="text-xs text-gray-500">IBAN</p>
+                            <p className="font-medium font-mono">{bankDetails.iban}</p>
+                        </div>
+                        <button
+                            onClick={() => handleCopy(bankDetails.iban, 'iban')}
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                            {copiedField === 'iban' ? <Check size={16} className="text-green-600" /> : <Copy size={16} className="text-gray-500" />}
+                        </button>
+                    </div>
+                )}
+
+                {bankDetails.swiftCode && (
+                    <div className="flex items-center justify-between bg-white p-3 rounded-lg">
+                        <div>
+                            <p className="text-xs text-gray-500">SWIFT/BIC Code</p>
+                            <p className="font-medium font-mono">{bankDetails.swiftCode}</p>
+                        </div>
+                        <button
+                            onClick={() => handleCopy(bankDetails.swiftCode, 'swift')}
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                            {copiedField === 'swift' ? <Check size={16} className="text-green-600" /> : <Copy size={16} className="text-gray-500" />}
+                        </button>
+                    </div>
+                )}
+
+                {bankDetails.bankAddress && (
+                    <div className="bg-white p-3 rounded-lg">
+                        <p className="text-xs text-gray-500">Bank Address</p>
+                        <p className="font-medium text-sm">{bankDetails.bankAddress}</p>
+                    </div>
+                )}
+            </div>
+            <button
+                onClick={() => {
+                    handleBankTransfer(selectedAuction);
+                }}
+                className="w-full bg-primary text-white hover:bg-primary/90 py-3 rounded-lg font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2 mt-5"
+            >
+                <>
+                    <Banknote size={18} />
+                    Confirm Bank Transfer
+                </>
+            </button>
+
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
+                <p className="text-xs text-yellow-800 flex items-start gap-2">
+                    <Info size={16} className="flex-shrink-0 mt-0.5" />
+                    <span>
+                        Funds may take 1-3 business days to clear.
+                    </span>
+                </p>
+            </div>
+        </div>
+    );
+};
 
 function WonAuctions() {
     const [auctions, setAuctions] = useState([]);
@@ -26,6 +176,12 @@ function WonAuctions() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [sortBy, setSortBy] = useState('newest');
+    const [processing, setProcessing] = useState(false);
+    const [bankDetails, setBankDetails] = useState(null);
+    const [copiedField, setCopiedField] = useState(null);
+    const [paymentCompleted, setPaymentCompleted] = useState(false);
+    const [showBankDetailsModal, setShowBankDetailsModal] = useState(false);
+    const [bankDetailsData, setBankDetailsData] = useState(null);
     const [statistics, setStatistics] = useState({
         totalWon: 0,
         totalSpent: 0,
@@ -93,17 +249,64 @@ function WonAuctions() {
         setAuctions(filtered);
     }, [filter, searchTerm, allAuctions, sortBy]);
 
+    const handleBankTransfer = async (selectedAuction) => {
+        const loadingToast = toast.loading('Recording your bank transfer...');
+
+        try {
+            const response = await axiosInstance.post("/api/v1/payments/create-bank-transfer-payment", {
+                auctionId: selectedAuction?._id,
+            });
+
+            if (response.data.success) {
+                toast.dismiss(loadingToast);
+                toast.success("Bank transfer initiated! Please transfer the amount to the provided bank details.");
+                setShowBankDetailsModal(false);
+                setProcessing(false);
+            }
+        } catch (error) {
+            toast.dismiss(loadingToast);
+            toast.error(error.response?.data?.message || "Failed to process bank transfer selection");
+        }
+    };
+
+    const fetchBankDetails = async () => {
+        const loadingToast = toast.loading('Fetching bank details...');
+
+        try {
+            const response = await axiosInstance.get("/api/v1/payments/bank-details");
+
+            if (response.data.success) {
+                toast.dismiss(loadingToast);
+                setBankDetailsData(response.data.data);
+                setShowBankDetailsModal(true);
+            }
+        } catch (error) {
+            toast.dismiss(loadingToast);
+            toast.error(error.response?.data?.message || "Failed to fetch bank details");
+        }
+    };
+
+    // Calculate total
+    const calculateTotal = (auction) => {
+        if (!auction) return 0;
+
+        const winningBid = auction.finalPrice || auction.currentPrice || auction.finalBid || 0;
+        const commission = auction.commissionAmount || 0;
+
+        return winningBid + commission;
+    };
+
     const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('nb-NO', {
+        return new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: 'NOK',
+            currency: 'USD',
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         }).format(amount);
     };
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('nb-NO', {
+        return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
@@ -144,7 +347,7 @@ function WonAuctions() {
                             <p className="text-red-600">{error}</p>
                             <button
                                 onClick={fetchWonAuctions}
-                                className="mt-4 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white hover:from-orange-500 hover:via-orange-600 hover:to-orange-700 px-4 py-2 rounded-lg"
+                                className="mt-4 bg-[#C59D55] text-white hover:bg-[#C59D55]/90 px-4 py-2 rounded-lg"
                             >
                                 Try Again
                             </button>
@@ -164,13 +367,25 @@ function WonAuctions() {
 
                 <BidderContainer>
                     <AccountInactiveBanner />
+                    {/* Bank Transfer Details - Show when selected */}
+                    {showBankDetailsModal && bankDetailsData && (
+                        <div className="fixed overflow-scroll inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                            <BankTransferDetails
+                                bankDetails={bankDetailsData}
+                                onCopy={(field) => setCopiedField(field)}
+                                handleBankTransfer={() => handleBankTransfer(selectedAuction)}
+                                onClose={() => {setShowBankDetailsModal(false); setProcessing(false)}}
+                                selectedAuction={selectedAuction}
+                            />
+                        </div>
+                    )}
                     {/* Celebratory Header */}
                     <div className="max-w-full pt-16 pb-7 md:pt-0">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                             <div>
                                 <div className="flex items-center gap-3 mb-2">
                                     <Trophy className="text-amber-500" size={32} />
-                                    <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                                    <h2 className="text-3xl md:text-4xl font-bold bg-[#C59D55] bg-clip-text text-transparent">
                                         Your Won Auctions
                                     </h2>
                                 </div>
@@ -183,7 +398,7 @@ function WonAuctions() {
 
                     {/* Gradient Stats Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <div className="bg-gradient-to-br from-amber-500 to-orange-500 text-white rounded-xl p-6 shadow-lg transform hover:scale-105 transition-transform duration-200">
+                        <div className="bg-[#C59D55] text-white rounded-xl p-6 shadow-lg transform hover:scale-105 transition-transform duration-200">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-amber-100 text-sm">Total Wins</p>
@@ -390,18 +605,45 @@ function WonAuctions() {
                                     </div> */}
 
                                     {/* Action Buttons */}
-                                    <div className="flex gap-3">
+                                    <div className="flex flex-col gap-3">
                                         <Link
                                             to={`/auction/${auction._id}`}
                                             target="_blank"
-                                            className="flex-1 text-center bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white hover:from-orange-500 hover:via-orange-600 hover:to-orange-700 py-3 rounded-lg font-semibold  transition-all"
+                                            className="flex-1 text-center bg-green-600 text-white hover:bg-green-700 py-3 rounded-lg font-semibold  transition-all px-6"
                                         >
                                             View Auction
                                         </Link>
 
-                                        {/* <button className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                                            <Share2 size={18} />
-                                        </button> */}
+                                        <Link
+                                            to={`/bidder/communication/${auction?._id}`}
+                                            className="flex-1 text-center bg-[#C59D55] text-white hover:bg-[#C59D55]/90 py-3 px-6 rounded-lg font-semibold transition-all"
+                                        >
+                                            Communication
+                                        </Link>
+
+                                        {/* Action Button - Single button that handles both payment methods */}
+                                        {auction?.paymentStatus == 'pending' && <button
+                                            onClick={() => {
+                                                setProcessing(true);
+                                                // setShowBankDetailsModal(true);
+                                                setSelectedAuction(auction)
+                                                fetchBankDetails();
+                                            }}
+                                            disabled={processing}
+                                            className="w-full bg-primary text-white hover:bg-primary/90 py-3 rounded-lg font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                                        >
+                                            {processing ? (
+                                                <>
+                                                    <Loader size={18} className="animate-spin" />
+                                                    Processing...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Banknote size={18} />
+                                                    Pay {formatCurrency(calculateTotal(auction))} via Bank Transfer
+                                                </>
+                                            )}
+                                        </button>}
                                     </div>
                                 </div>
                             </div>

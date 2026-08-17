@@ -45,9 +45,9 @@ const BuyNowModal = ({ isOpen, onClose, onConfirm, auction, loading, isGiveaway 
 
     if (!isOpen) return null;
 
-    const formatNOK = (amount) => {
-        if (!amount && amount !== 0) return "0 kr";
-        return `${Number(amount).toLocaleString("nb-NO")} kr`;
+    const formatUSD = (amount) => {
+        if (!amount && amount !== 0) return "$0";
+        return `$${Number(amount).toLocaleString("en-US")}`;
     };
 
     const total = isGiveaway
@@ -94,20 +94,20 @@ const BuyNowModal = ({ isOpen, onClose, onConfirm, auction, loading, isGiveaway 
                             <div className="flex justify-between text-gray-700">
                                 <span>Buy Now Price</span>
                                 <span className="font-semibold">
-                                    {formatNOK(auction?.buyNowPrice)}
+                                    {formatUSD(auction?.buyNowPrice)}
                                 </span>
                             </div>
 
                             <div className="flex justify-between text-gray-700">
                                 <span>Service Fee</span>
                                 <span className="font-semibold">
-                                    {formatNOK(serviceFee)}
+                                    {formatUSD(serviceFee)}
                                 </span>
                             </div>
 
                             <div className="border-t pt-2 flex justify-between text-lg font-bold text-green-600">
                                 <span>Total Payable</span>
-                                <span>{formatNOK(total)}</span>
+                                <span>{formatUSD(total)}</span>
                             </div>
                         </div>
                     )}
@@ -129,7 +129,7 @@ const BuyNowModal = ({ isOpen, onClose, onConfirm, auction, loading, isGiveaway 
                             {!isGiveaway && (
                                 <li className="flex items-center gap-2">
                                     <CheckCircle className="h-4 w-4 text-green-500" />
-                                    Final price locked at {formatNOK(auction?.buyNowPrice)}
+                                    Final price locked at {formatUSD(auction?.buyNowPrice)}
                                 </li>
                             )}
                             <li className="flex items-center gap-2">

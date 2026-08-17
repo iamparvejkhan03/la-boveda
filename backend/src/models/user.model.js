@@ -83,6 +83,97 @@ const userSchema = new Schema(
       smsUpdates: { type: Boolean, default: false },
       favoriteCategories: [{ type: String }],
     },
+    // Payout Methods for Sellers
+    payoutMethods: {
+      paypal: {
+        email: {
+          type: String,
+          trim: true,
+          lowercase: true,
+          validate: {
+            validator: function (email) {
+              if (!email) return true; // Optional field
+              return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            },
+            message: "Please enter a valid PayPal email address",
+          },
+        },
+        isVerified: {
+          type: Boolean,
+          default: true,
+        },
+        addedAt: Date,
+        updatedAt: Date,
+      },
+      payoneer: {
+        email: {
+          type: String,
+          trim: true,
+          lowercase: true,
+          validate: {
+            validator: function (email) {
+              if (!email) return true; // Optional field
+              return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            },
+            message: "Please enter a valid Payoneer email address",
+          },
+        },
+        isVerified: {
+          type: Boolean,
+          default: true,
+        },
+        addedAt: Date,
+        updatedAt: Date,
+      },
+      bankTransfer: {
+        accountHolderName: {
+          type: String,
+          trim: true,
+        },
+        bankName: {
+          type: String,
+          trim: true,
+        },
+        accountNumber: {
+          type: String,
+          trim: true,
+        },
+        routingNumber: {
+          type: String,
+          trim: true,
+        },
+        iban: {
+          type: String,
+          trim: true,
+        },
+        swiftCode: {
+          type: String,
+          trim: true,
+        },
+        currency: {
+          type: String,
+          default: "USD",
+          trim: true,
+        },
+        bankAddress: {
+          type: String,
+          trim: true,
+        },
+        isVerified: {
+          type: Boolean,
+          default: true,
+        },
+        addedAt: Date,
+        updatedAt: Date,
+      },
+    },
+
+    // Default payout method preference
+    defaultPayoutMethod: {
+      type: String,
+      enum: ["paypal", "payoneer", "bankTransfer", null],
+      default: "bankTransfer",
+    },
 
     // Account Status
     isVerified: {

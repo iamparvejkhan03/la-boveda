@@ -4,7 +4,7 @@ import { X, Upload, FileText, CreditCard, Building, Banknote, Globe, AlertCircle
 const PaymentStatusModal = ({ isOpen, onClose, auction, onSubmit, loading }) => {
     const [formData, setFormData] = useState({
         paymentStatus: auction?.paymentStatus || 'pending',
-        paymentMethod: auction?.paymentMethod || '',
+        paymentMethod: auction?.paymentMethod || 'bank_transfer',
         transactionId: auction?.transactionId || '',
         notes: '',
         invoiceFile: null
@@ -17,7 +17,7 @@ const PaymentStatusModal = ({ isOpen, onClose, auction, onSubmit, loading }) => 
         if (auction) {
             setFormData({
                 paymentStatus: auction.paymentStatus || 'pending',
-                paymentMethod: auction.paymentMethod || '',
+                paymentMethod: auction.paymentMethod || 'bank_transfer',
                 transactionId: auction.transactionId || '',
                 notes: '',
                 invoiceFile: null
@@ -110,8 +110,8 @@ const PaymentStatusModal = ({ isOpen, onClose, auction, onSubmit, loading }) => 
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             New Payment Status *
                         </label>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                            {['pending', 'processing', 'completed', 'failed', 'refunded', 'cancelled'].map((status) => (
+                        <div className="grid grid-cols-2 md:grid-cols-2 gap-2">
+                            {['pending', 'processing', 'completed', 'failed'].map((status) => (
                                 <button
                                     key={status}
                                     type="button"
@@ -135,7 +135,8 @@ const PaymentStatusModal = ({ isOpen, onClose, auction, onSubmit, loading }) => 
                                 Payment Method
                             </label>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                                {['credit_card', 'bank_transfer', 'paypal', 'other'].map((method) => (
+                                {/* {['credit_card', 'bank_transfer', 'paypal', 'other'].map((method) => ( */}
+                                {['bank_transfer'].map((method) => (
                                     <button
                                         key={method}
                                         type="button"
@@ -145,10 +146,10 @@ const PaymentStatusModal = ({ isOpen, onClose, auction, onSubmit, loading }) => 
                                             : 'border-gray-200 text-gray-700 hover:bg-gray-50'
                                         }`}
                                     >
-                                        {method === 'credit_card' && <CreditCard className="h-5 w-5" />}
+                                        {/* {method === 'credit_card' && <CreditCard className="h-5 w-5" />} */}
                                         {method === 'bank_transfer' && <Building className="h-5 w-5" />}
-                                        {method === 'paypal' && <Globe className="h-5 w-5" />}
-                                        {method === 'other' && <Banknote className="h-5 w-5" />}
+                                        {/* {method === 'paypal' && <Globe className="h-5 w-5" />} */}
+                                        {/* {method === 'other' && <Banknote className="h-5 w-5" />} */}
                                         <span className="text-xs capitalize">{method.replace('_', ' ')}</span>
                                     </button>
                                 ))}

@@ -39,9 +39,9 @@ import Toyota from './Toyota.webp';
 import Volvo from './volvo.webp';
 
 const otherData = {
-    phone: '+471618832737',
-    email: 'admin@bidnordic.com',
-    address: 'Norway'
+    phone: '+11234567890',
+    email: 'admin@la-boveda.com',
+    address: 'Venezuela',
 }
 
 export {

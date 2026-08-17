@@ -213,16 +213,16 @@ function AllOffers() {
     };
 
     const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('nb-NO', {
+        return new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: 'NOK',
+            currency: 'USD',
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         }).format(amount);
     };
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('nb-NO', {
+        return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
@@ -230,7 +230,7 @@ function AllOffers() {
     };
 
     const formatDateTime = (dateString) => {
-        return new Date(dateString).toLocaleString('nb-NO', {
+        return new Date(dateString).toLocaleString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
@@ -318,14 +318,14 @@ function AllOffers() {
     const statCards = [
         {
             title: "Total Offers",
-            value: stats.totalOffers?.toLocaleString('nb-NO') || "0",
+            value: stats.totalOffers?.toLocaleString('en-US') || "0",
             change: "Across all your auctions",
             icon: <DollarSign size={24} />,
             color: "blue"
         },
         {
             title: "Pending Offers",
-            value: stats.pending?.toLocaleString('nb-NO') || "0",
+            value: stats.pending?.toLocaleString('en-US') || "0",
             change: `Worth ${formatCurrency(stats.pendingValue || 0)}`,
             icon: <Clock size={24} />,
             color: "yellow"
@@ -829,7 +829,7 @@ function AllOffers() {
                                     Counter Offer Amount <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
-                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">kr</span>
+                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
                                     <input
                                         type="number"
                                         className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"

@@ -80,7 +80,7 @@ const PaymentStatusDropdown = ({ auction, onStatusUpdate, disabled }) => {
                             onClick={() => setIsOpen(false)}
                         />
                         <div className="absolute z-20 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
-                            {['pending', 'processing', 'completed', 'failed', 'refunded', 'cancelled'].map((status) => {
+                            {['pending', 'processing', 'completed', 'failed'].map((status) => {
                                 const config = getStatusConfig(status);
                                 return (
                                     <button

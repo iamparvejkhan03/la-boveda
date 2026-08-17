@@ -23,7 +23,9 @@ import {
     MessageCircle,
     Hand,
     Tags,
-    PoundSterling
+    PoundSterling,
+    BanknoteArrowDown,
+    BanknoteArrowUp
 } from "lucide-react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { logo } from "../../assets";
@@ -57,6 +59,11 @@ const navigation = [
         icon: <Hand size={20} />
     },
     {
+        name: 'Communications',
+        path: '/admin/communications/all',
+        icon: <MessageSquare size={20} />
+    },
+    {
         name: 'Categories',
         path: '/admin/categories',
         icon: <Tags size={20} />
@@ -75,6 +82,16 @@ const navigation = [
         name: 'Support',
         path: '/admin/support/inquiries',
         icon: <MessageSquare size={20} />,
+    },
+    {
+        name: 'Payouts',
+        path: '/admin/payouts',
+        icon: <BanknoteArrowDown size={20} />
+    },
+    {
+        name: 'Bank Details',
+        path: '/admin/payout-methods',
+        icon: <BanknoteArrowUp size={20} />
     },
     {
         name: 'Commissions',
@@ -146,7 +163,7 @@ function Sidebar() {
             {/* Mobile menu button */}
             <button
                 onClick={toggleSidebar}
-                className={`md:hidden ${isOpen && isMobile ? 'hidden' : 'fixed'} top-4 left-4 z-30 sm:z-40 p-2 rounded-md bg-slate-900 text-white`}
+                className={`md:hidden ${isOpen && isMobile ? 'hidden' : 'fixed'} top-4 left-4 z-30 sm:z-40 p-2 rounded-md bg-[#080A0D] text-white`}
             >
                 {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -154,14 +171,14 @@ function Sidebar() {
             {/* Overlay for mobile */}
             {isOpen && isMobile && (
                 <div
-                    className="fixed inset-0 bg-[#1e2d3b] bg-opacity-50 z-40"
+                    className="fixed inset-0 bg-[#080A0D] bg-opacity-50 z-40"
                     onClick={() => setIsOpen(false)}
                 />
             )}
 
             {/* Sidebar */}
             <aside className={`
-                fixed md:relative w-64 bg-slate-900 text-white h-screen md:h-auto md:min-h-screen overflow-y-auto z-50 p-4 flex flex-col 
+                fixed md:relative w-64 bg-[#080A0D] text-white h-screen md:h-auto md:min-h-screen overflow-y-auto z-50 p-4 flex flex-col 
                 transform transition-transform duration-300 ease-in-out
                 ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
             `}>
@@ -180,7 +197,7 @@ function Sidebar() {
 
                 {/* Admin Badge */}
                 <div className="px-4 mb-6">
-                    <div className="bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 rounded-lg p-3 text-center">
+                    <div className="bg-gradient-to-r from-[#F2D18A] via-[#C59D55] to-[#8C6828] rounded-lg p-3 text-center">
                         <div className="flex items-center justify-center gap-2">
                             <Shield size={16} />
                             <span className="text-sm font-medium">Administrator</span>
@@ -243,8 +260,8 @@ function Sidebar() {
                                         onClick={() => isMobile && setIsOpen(false)}
                                         className={({ isActive }) =>
                                             `flex items-center p-3 rounded-lg transition-all duration-200 ${isActive
-                                                ? 'bg-orange-500 text-white shadow-lg'
-                                                : 'text-white hover:bg-orange-600 hover:text-white'
+                                                ? 'bg-[#C59D55] text-white shadow-lg'
+                                                : 'text-white hover:bg-[#C59D55]/90 hover:text-white'
                                             }`
                                         }
                                     >

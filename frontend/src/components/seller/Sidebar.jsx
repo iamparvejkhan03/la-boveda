@@ -10,7 +10,9 @@ import {
     Bell,
     Plus,
     CreditCard,
-    Hand
+    Hand,
+    BanknoteArrowUp,
+    BanknoteArrowDown
 } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
 import { logo } from "../../assets";
@@ -24,6 +26,8 @@ const navigation = [
     { name: 'Sold Auctions', path: '/seller/auctions/sold', icon: <Award size={20} /> },
     { name: 'Bid History', path: '/seller/bids/history', icon: <TrendingUp size={20} /> },
     { name: 'All Offers', path: '/seller/offers/all', icon: <Hand size={20} /> },
+    { name: 'Payout Methods', path: '/seller/payout-methods', icon: <BanknoteArrowUp size={20} /> },
+    { name: 'Payouts', path: '/seller/payouts', icon: <BanknoteArrowDown size={20} /> },
     // { name: 'Billing', path: '/seller/billing', icon: <CreditCard size={20} /> },
     // { name: 'Notifications', path: '/seller/notifications', icon: <Bell size={20} /> },
     { name: 'Profile', path: '/seller/profile', icon: <User size={20} /> },
@@ -70,7 +74,7 @@ function Sidebar() {
             {/* Mobile menu button */}
             <button
                 onClick={toggleSidebar}
-                className={`md:hidden ${isOpen && isMobile ? 'hidden' : 'fixed'} top-4 left-4 z-30 sm:z-40 p-2 rounded-md bg-black text-white`}
+                className={`md:hidden ${isOpen && isMobile ? 'hidden' : 'fixed'} top-4 left-4 z-30 sm:z-40 p-2 rounded-md bg-[#080A0D] text-white`}
             >
                 {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -78,14 +82,14 @@ function Sidebar() {
             {/* Overlay for mobile */}
             {isOpen && isMobile && (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                    className="fixed inset-0 bg-[#080A0D] bg-opacity-50 z-40"
                     onClick={() => setIsOpen(false)}
                 />
             )}
 
             {/* Sidebar */}
             <aside className={`
-        fixed md:relative w-64 bg-slate-900 text-white h-screen md:h-auto md:min-h-screen overflow-y-auto p-4 flex flex-col z-50
+        fixed md:relative w-64 bg-[#080A0D] text-white h-screen md:h-auto md:min-h-screen overflow-y-auto p-4 flex flex-col z-50
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
@@ -112,8 +116,8 @@ function Sidebar() {
                                     onClick={() => isMobile && setIsOpen(false)}
                                     className={({ isActive }) =>
                                         `flex items-center p-3 rounded-lg transition-all duration-200 ${isActive
-                                            ? 'bg-orange-500 text-white shadow-lg'
-                                            : 'text-white hover:bg-orange-600 hover:text-white'
+                                            ? 'bg-[#C59D55] text-white shadow-lg'
+                                            : 'text-white hover:bg-[#C59D55]/90 hover:text-white'
                                         }`
                                     }
                                 >

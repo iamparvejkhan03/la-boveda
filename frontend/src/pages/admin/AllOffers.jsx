@@ -156,16 +156,16 @@ function AllOffers() {
     };
 
     const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('nb-NO', {
+        return new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: 'NOK',
+            currency: 'USD',
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         }).format(amount);
     };
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('nb-NO', {
+        return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
@@ -333,14 +333,14 @@ function AllOffers() {
     const statCards = [
         {
             title: "Total Offers",
-            value: stats.totalOffers?.toLocaleString('nb-NO') || "0",
+            value: stats.totalOffers?.toLocaleString('en-US') || "0",
             change: "Across all auctions",
             icon: <Banknote size={24} />,
             color: "blue"
         },
         {
             title: "Pending Offers",
-            value: (stats.statusStats?.pending?.count || 0).toLocaleString('nb-NO'),
+            value: (stats.statusStats?.pending?.count || 0).toLocaleString('en-US'),
             change: "Awaiting response",
             icon: <Clock size={24} />,
             color: "yellow"

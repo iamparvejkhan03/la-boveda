@@ -1,189 +1,396 @@
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { Container } from "../components";
 import { logo, otherData } from "../assets";
-import { Facebook, Instagram, Linkedin, Mail, Phone, Twitter, X, Youtube } from "lucide-react";
+import {
+    ArrowUpRight,
+    Facebook,
+    Instagram,
+    Linkedin,
+    Mail,
+    Phone,
+    ShieldCheck,
+    Sparkles,
+    Twitter,
+    Youtube,
+} from "lucide-react";
 
 function Footer() {
-    const navigate = useNavigate();
-
     const quickLinks = [
-        { name: 'Home', href: '/' },
-        { name: 'About', href: '/about' },
-        { name: 'Contact', href: '/contact' },
-        { name: 'FAQs', href: '/faqs' },
+        { name: "Home", href: "/" },
+        { name: "About Us", href: "/about" },
+        { name: "Contact", href: "/contact" },
+        { name: "FAQs", href: "/faqs" },
+    ];
+
+    const auctionLinks = [
+        {
+            name: "Live Auctions",
+            href: "/auctions?status=active",
+        },
+        {
+            name: "Upcoming Auctions",
+            href: "/auctions?status=approved",
+        },
+        {
+            name: "Sold Collectibles",
+            href: "/auctions?status=sold",
+        },
+        {
+            name: "Explore All",
+            href: "/auctions",
+        },
     ];
 
     const legalPolicies = [
-        { name: 'Privacy Policy', href: '/privacy-policy' },
-        { name: 'Terms of Use', href: '/terms-of-use' },
-        { name: 'Buyer Agreement', href: '/buyer-agreement' },
-        { name: 'Seller Agreement', href: '/seller-agreement' },
+        {
+            name: "Privacy Policy",
+            href: "/privacy-policy",
+        },
+        {
+            name: "Terms of Use",
+            href: "/terms-of-use",
+        },
+        {
+            name: "Buyer Agreement",
+            href: "/buyer-agreement",
+        },
+        {
+            name: "Seller Agreement",
+            href: "/seller-agreement",
+        },
     ];
 
-    const categoryImg = [
+    const socialLinks = [
         {
-            title: 'Live',
-            url: '/auctions?status=active'
+            icon: Instagram,
+            href: "#",
+            label: "Instagram",
         },
         {
-            title: 'Sold',
-            url: '/auctions?status=sold'
+            icon: Facebook,
+            href: "#",
+            label: "Facebook",
         },
         {
-            title: 'Upcoming',
-            url: '/auctions?status=approved'
+            icon: Linkedin,
+            href: "#",
+            label: "LinkedIn",
         },
         {
-            title: 'Explore All',
-            url: '/auctions'
-        }
+            icon: Youtube,
+            href: "#",
+            label: "YouTube",
+        },
     ];
 
     return (
-        <footer className="bg-slate-900 text-gray-200 font-light py-12 relative overflow-hidden">
-            {/* Industrial Background Pattern - Fixed pointer events */}
-            <div className="absolute inset-0 opacity-10 pointer-events-none">
-                <div className="absolute inset-0" style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                }} />
-            </div>
-            
-            {/* Industrial Mesh Lines - Fixed pointer events */}
-            <div className="absolute inset-0 opacity-20 pointer-events-none">
-                <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-                        </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#grid)" />
-                </svg>
-            </div>
+        <footer className="relative overflow-hidden bg-[#080A0D] text-white">
 
-            {/* Gradient Orbs - Fixed pointer events */}
-            <div className="absolute top-20 left-10 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-20 right-10 w-80 h-80 bg-orange-600/5 rounded-full blur-3xl pointer-events-none" />
+            {/* =====================================================
+                BACKGROUND
+            ====================================================== */}
 
-            {/* Content with proper z-index */}
-            <Container className='relative z-10 px-6 md:px-16 lg:px-24 xl:px-32'>
-                <div className='flex flex-wrap justify-between gap-12 md:gap-6'>
-                    <div className='max-w-80 relative z-20'>
-                        <Link to='/' className="flex gap-2 z-50 mb-4">
-                            <img src={logo} alt="logo" className="h-10 md:h-12" />
+            {/* Gold glow */}
+            <div className="pointer-events-none absolute -left-40 top-0 h-[450px] w-[450px] rounded-full bg-[#C59D55]/[0.045] blur-[120px]" />
+
+            <div className="pointer-events-none absolute -right-40 bottom-0 h-[500px] w-[500px] rounded-full bg-[#C59D55]/[0.035] blur-[130px]" />
+
+            {/* Subtle grid */}
+            <div
+                className="pointer-events-none absolute inset-0 opacity-[0.018]"
+                style={{
+                    backgroundImage: `
+                        linear-gradient(rgba(255,255,255,.8) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,.8) 1px, transparent 1px)
+                    `,
+                    backgroundSize: "70px 70px",
+                }}
+            />
+
+            <Container className="relative z-10">
+
+                {/* =================================================
+                    BRAND STATEMENT
+                ================================================== */}
+
+                {/* <div className="border-b border-white/[0.08] py-16 lg:py-20">
+
+                    <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
+
+                        <div className="max-w-2xl">
+
+                            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#C59D55]/20 bg-[#C59D55]/[0.06] px-4 py-2">
+                                <Sparkles
+                                    size={13}
+                                    className="text-[#C59D55]"
+                                />
+
+                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#D8B96F]">
+                                    Built for Collectors
+                                </span>
+                            </div>
+
+                            <h2 className="text-3xl font-black leading-tight tracking-[-0.035em] sm:text-4xl lg:text-5xl">
+                                Find something
+                                <span className="ml-2 font-medium italic text-white/60">
+                                    worth keeping.
+                                </span>
+                            </h2>
+
+                            <p className="mt-5 max-w-xl text-sm leading-7 text-white/40">
+                                Discover rare sports cards, signed jerseys,
+                                game-used memorabilia, and remarkable
+                                collectibles from passionate sellers and
+                                collectors.
+                            </p>
+                        </div>
+
+                        <div className="flex shrink-0 items-center gap-3">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#C59D55]/10">
+                                <ShieldCheck
+                                    size={20}
+                                    className="text-[#C59D55]"
+                                />
+                            </div>
+
+                            <div>
+                                <p className="text-sm font-semibold text-white">
+                                    Collect with confidence
+                                </p>
+
+                                <p className="mt-0.5 text-xs text-white/30">
+                                    Secure & transparent marketplace
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div> */}
+
+                {/* =================================================
+                    MAIN FOOTER
+                ================================================== */}
+
+                <div className="grid gap-12 py-14 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr_1.25fr] lg:gap-10">
+
+                    {/* =================================================
+                        BRAND
+                    ================================================== */}
+
+                    <div className="max-w-xs">
+
+                        <Link
+                            to="/"
+                            className="inline-flex items-center"
+                        >
+                            <img
+                                src={logo}
+                                alt="Logo"
+                                className="h-10 w-auto object-contain sm:h-11"
+                            />
                         </Link>
-                        <p className=''>
-                            Bid with confidence on quality machinery — verified listings, real-time updates, and complete transparency. That's the BidNordic promise.
+
+                        <p className="mt-5 text-base leading-6 text-white/60 font-light">
+                            A collector-first marketplace for discovering,
+                            buying, and bidding on exceptional sports and
+                            non-sports memorabilia.
                         </p>
-                        <div className='flex items-center gap-3 mt-4'>
-                            <Link to="#" target="_blank" className="hover:text-orange-500 transition-colors">
-                                <Instagram strokeWidth={1.25} />
-                            </Link>
-                            <Link to="#" target="_blank" className="hover:text-orange-500 transition-colors">
-                                <Facebook strokeWidth={1.25} />
-                            </Link>
+
+                        {/* Socials */}
+                        <div className="mt-6 flex items-center gap-2.5">
+                            {socialLinks.map((social) => {
+                                const Icon = social.icon;
+
+                                return (
+                                    <Link
+                                        key={social.label}
+                                        to={social.href}
+                                        target="_blank"
+                                        aria-label={social.label}
+                                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.025] text-white/40 transition-all duration-300 hover:-translate-y-1 hover:border-[#C59D55]/30 hover:bg-[#C59D55]/10 hover:text-[#C59D55]"
+                                    >
+                                        <Icon size={15} strokeWidth={2} />
+                                    </Link>
+                                );
+                            })}
                         </div>
                     </div>
 
-                    <div className="relative z-20">
-                        <p className='text-lg text-gray-300 font-semibold'>
-                            Quick Links
-                        </p>
-                        <ul className='mt-3 flex flex-col gap-2'>
-                            {quickLinks.map(link => (
-                                <li className="relative py-1" key={link.name}>
-                                    <NavLink 
-                                        className={({ isActive }) => 
-                                            `text-white hover:text-orange-500 transition-colors ${isActive ? 'text-orange-500' : ''}`
-                                        } 
+                    {/* =================================================
+                        QUICK LINKS
+                    ================================================== */}
+
+                    <div>
+                        <h3 className="text-xs font-bold uppercase tracking-[0.16em] text-white">
+                            Explore
+                        </h3>
+
+                        <ul className="mt-5 space-y-3">
+                            {quickLinks.map((link) => (
+                                <li key={link.name}>
+                                    <NavLink
                                         to={link.href}
+                                        className={({ isActive }) =>
+                                            `group font-light flex items-center gap-1.5 text-base transition-colors ${isActive
+                                                ? "text-[#C59D55]"
+                                                : "text-white/60 hover:text-white"
+                                            }`
+                                        }
                                     >
                                         {link.name}
+
+                                        <ArrowUpRight
+                                            size={12}
+                                            className="opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100"
+                                        />
                                     </NavLink>
                                 </li>
                             ))}
                         </ul>
                     </div>
 
-                    <div className="relative z-20">
-                        <p className='text-lg text-gray-300 font-semibold'>
+                    {/* =================================================
+                        AUCTIONS
+                    ================================================== */}
+
+                    <div>
+                        <h3 className="text-xs font-bold uppercase tracking-[0.16em] text-white">
                             Auctions
-                        </p>
-                        <ul className='mt-3 flex flex-col gap-2'>
-                            {categoryImg.map(category => (
-                                <li key={category.title}>
-                                    <Link 
-                                        to={category.url} 
-                                        className="text-white hover:text-orange-500 transition-colors"
+                        </h3>
+
+                        <ul className="mt-5 space-y-3">
+                            {auctionLinks.map((link) => (
+                                <li key={link.name}>
+                                    <Link
+                                        to={link.href}
+                                        className="group flex items-center gap-1.5 text-base text-white/60 transition-colors hover:text-white font-light"
                                     >
-                                        {category.title}
+                                        {link.name}
+
+                                        <ArrowUpRight
+                                            size={12}
+                                            className="opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100"
+                                        />
                                     </Link>
                                 </li>
                             ))}
                         </ul>
                     </div>
 
-                    <div className="relative z-20">
-                        <p className='text-lg text-gray-300 font-semibold'>
-                            Legal Policies
-                        </p>
-                        <ul className='mt-3 flex flex-col gap-2'>
-                            {legalPolicies.map(service => (
-                                <li key={service.name}>
-                                    <Link 
-                                        to={service.href} 
-                                        className="text-white hover:text-orange-500 transition-colors"
+                    {/* =================================================
+                        LEGAL
+                    ================================================== */}
+
+                    <div>
+                        <h3 className="text-xs font-bold uppercase tracking-[0.16em] text-white">
+                            Legal
+                        </h3>
+
+                        <ul className="mt-5 space-y-3">
+                            {legalPolicies.map((policy) => (
+                                <li key={policy.name}>
+                                    <Link
+                                        to={policy.href}
+                                        className="text-base text-white/60 font-light transition-colors hover:text-[#C59D55]"
                                     >
-                                        {service.name}
+                                        {policy.name}
                                     </Link>
                                 </li>
                             ))}
                         </ul>
                     </div>
 
-                    <div className='max-w-80 relative z-20'>
-                        <p className='text-lg text-gray-300 font-semibold'>
+                    {/* =================================================
+                        CONTACT
+                    ================================================== */}
+
+                    <div>
+                        <h3 className="text-xs font-bold uppercase tracking-[0.16em] text-white">
                             Reach Out
-                        </p>
-                        <ul className='mt-3 flex flex-col gap-2'>
-                            <li className="flex items-center gap-2">
-                                <Phone size={18} className="text-white" />
-                                <Link 
-                                    className="text-white hover:text-orange-500 transition-colors" 
-                                    to={`tel:${otherData.phone}`}
-                                >
-                                    +47 (1)61 883 2737
-                                </Link>
-                            </li>
-                            <li className="flex items-center gap-2">
-                                <Mail size={18} className="text-white" />
-                                <Link 
-                                    className="text-white hover:text-orange-500 transition-colors" 
-                                    to={`mailto:${otherData.email}`}
-                                >
-                                    {otherData.email}
-                                </Link>
-                            </li>
-                        </ul>
+                        </h3>
+
+                        <div className="mt-5 space-y-4">
+
+                            {/* Phone */}
+                            <Link
+                                to={`tel:${otherData.phone}`}
+                                className="group flex items-start gap-3"
+                            >
+                                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.04] text-white/40 transition-colors group-hover:bg-[#C59D55]/10 group-hover:text-[#C59D55]">
+                                    <Phone size={15} />
+                                </div>
+
+                                <div>
+                                    <p className="text-[10px] uppercase tracking-wider text-white/55">
+                                        Phone
+                                    </p>
+
+                                    <p className="mt-1 text-base text-white/60 transition-colors group-hover:text-white font-light">
+                                        {otherData.phone}
+                                    </p>
+                                </div>
+                            </Link>
+
+                            {/* Email */}
+                            <Link
+                                to={`mailto:${otherData.email}`}
+                                className="group flex items-start gap-3"
+                            >
+                                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.04] text-white/40 transition-colors group-hover:bg-[#C59D55]/10 group-hover:text-[#C59D55]">
+                                    <Mail size={15} />
+                                </div>
+
+                                <div className="min-w-0">
+                                    <p className="text-[10px] uppercase tracking-wider text-white/55">
+                                        Email
+                                    </p>
+
+                                    <p className="mt-1 break-all text-base text-white/60 transition-colors group-hover:text-white font-light">
+                                        {otherData.email}
+                                    </p>
+                                </div>
+                            </Link>
+                        </div>
                     </div>
                 </div>
 
-                <hr className='border-gray-700 mt-8' />
+                {/* =================================================
+                    BOTTOM
+                ================================================== */}
 
-                <div className='relative z-20 flex flex-col md:flex-row gap-2 md:items-center justify-between py-5'>
-                    <p>
-                        <span>© {new Date().getFullYear()} &nbsp;</span>
-                        <Link to="/" className="underline hover:text-orange-500 transition-colors">
-                            BidNordic.
-                        </Link>
-                        &nbsp; All rights reserved. &nbsp;
-                    </p>
-                    <div className="flex flex-wrap flex-row gap-4 items-center">
-                        <Link to={'/terms-of-use'} className="hover:text-orange-500 transition-colors">
-                            Terms of Use
-                        </Link>
-                        <Link to={'/privacy-policy'} className="hover:text-orange-500 transition-colors">
-                            Privacy Policy
-                        </Link>
+                <div className="border-t border-white/[0.08] py-6">
+
+                    <div className="flex flex-col gap-4 text-xs text-white/45 md:flex-row md:items-center md:justify-between">
+
+                        {/* Copyright */}
+                        <p>
+                            © {new Date().getFullYear()}{" "}
+                            <Link
+                                to="/"
+                                className="font-medium text-white/55 transition-colors hover:text-[#C59D55]"
+                            >
+                                La-Bóveda
+                            </Link>
+                            . All rights reserved.
+                        </p>
+
+                        {/* Bottom links */}
+                        <div className="flex flex-wrap items-center gap-5">
+                            <Link
+                                to="/terms-of-use"
+                                className="transition-colors hover:text-white"
+                            >
+                                Terms of Use
+                            </Link>
+
+                            <span className="h-1 w-1 rounded-full bg-white/15" />
+
+                            <Link
+                                to="/privacy-policy"
+                                className="transition-colors hover:text-white"
+                            >
+                                Privacy Policy
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </Container>

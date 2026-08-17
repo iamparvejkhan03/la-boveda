@@ -277,7 +277,7 @@ function Profile() {
                                             key={section.id}
                                             onClick={() => setActiveSection(section.id)}
                                             className={`flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${activeSection === section.id
-                                                ? `text-white bg-orange-500 font-medium`
+                                                ? `text-white bg-[#C59D55] font-medium`
                                                 : "text-secondary hover:bg-gray-100"
                                                 }`}
                                         >
@@ -304,7 +304,7 @@ function Profile() {
                                                     <button
                                                         onClick={handleSave}
                                                         disabled={saving}
-                                                        className="flex items-center gap-2 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white hover:from-orange-500 hover:via-orange-600 hover:to-orange-700 px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+                                                        className="flex items-center gap-2 bg-[#C59D55] text-white hover:bg-[#C59D55]/90 px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
                                                     >
                                                         <Save size={16} />
                                                         {saving ? 'Saving...' : 'Save Changes'}
@@ -321,7 +321,7 @@ function Profile() {
                                             ) : (
                                                 <button
                                                     onClick={() => setIsEditing(true)}
-                                                    className="flex items-center gap-2 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white hover:from-orange-500 hover:via-orange-600 hover:to-orange-700 px-4 py-2 rounded-lg transition-colors"
+                                                    className="flex items-center gap-2 bg-[#C59D55] text-white hover:bg-[#C59D55]/90 px-4 py-2 rounded-lg transition-colors"
                                                 >
                                                     <Edit size={16} />
                                                     Edit
@@ -428,7 +428,7 @@ function Profile() {
                                                     <label className="block text-sm font-medium text-secondary">Member Since</label>
                                                     <input
                                                         type="text"
-                                                        value={new Date(userData.createdAt).toLocaleDateString('nb-NO')}
+                                                        value={new Date(userData.createdAt).toLocaleDateString('en-US')}
                                                         disabled
                                                         className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-100"
                                                     />
@@ -540,9 +540,9 @@ function Profile() {
                                         <div>
                                             <p className="text-sm text-gray-500">Total Revenue</p>
                                             <p className="font-semibold text-lg">
-                                                {new Intl.NumberFormat('nb-NO', {
+                                                {new Intl.NumberFormat('en-US', {
                                                     style: 'currency',
-                                                    currency: 'NOK',
+                                                    currency: 'USD',
                                                     minimumFractionDigits: 0
                                                 }).format(stats.totalRevenue)}
                                             </p>
@@ -564,9 +564,9 @@ function Profile() {
                                         <div>
                                             <p className="text-sm text-gray-500">Avg. Sale Price</p>
                                             <p className="font-semibold text-lg">
-                                                {new Intl.NumberFormat('nb-NO', {
+                                                {new Intl.NumberFormat('en-US', {
                                                     style: 'currency',
-                                                    currency: 'NOK',
+                                                    currency: 'USD',
                                                     minimumFractionDigits: 0
                                                 }).format(stats.avgSalePrice)}
                                             </p>
@@ -677,7 +677,7 @@ const PasswordChangeForm = ({ onChangePassword, saving }) => {
                 <button
                     type="submit"
                     disabled={saving}
-                    className="bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white hover:from-orange-500 hover:via-orange-600 hover:to-orange-700 px-6 py-3 rounded-lg transition-colors disabled:opacity-50"
+                    className="bg-[#C59D55] text-white hover:bg-[#C59D55]/90 px-6 py-3 rounded-lg transition-colors disabled:opacity-50"
                 >
                     {saving ? 'Changing Password...' : 'Change Password'}
                 </button>

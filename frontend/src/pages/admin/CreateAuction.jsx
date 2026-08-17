@@ -556,6 +556,7 @@ const CreateAuction = () => {
 
     const nextStep = async () => {
         let isValid = true;
+        scrollTo({top: 0, behavior: 'smooth'});
 
         if (step === 1) {
             const fieldsToValidate = [
@@ -623,6 +624,7 @@ const CreateAuction = () => {
 
     const prevStep = () => {
         setStep(step - 1);
+        scrollTo({top: 0, behavior: 'smooth'});
     };
 
     const handlePhotoUpload = (e) => {
@@ -828,7 +830,7 @@ const CreateAuction = () => {
                                             Item Details
                                         </h2>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-6">
                                             <div>
                                                 <label htmlFor="title" className="block text-sm font-medium text-secondary mb-1">
                                                     Item Name *
@@ -838,7 +840,7 @@ const CreateAuction = () => {
                                                     id="title"
                                                     type="text"
                                                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                                                    placeholder="e.g., John Deere 6120M Tractor"
+                                                    placeholder="e.g., 1985 Star Co. Michael Jordan #117 BGS Gem Mint 9.5"
                                                 />
                                                 {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
                                             </div>
@@ -936,7 +938,7 @@ const CreateAuction = () => {
                                                         id="location"
                                                         type="text"
                                                         className="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                                                        placeholder="e.g., Sandhult, Västra Götalands län, Sweden"
+                                                        placeholder="e.g., Altamira, Caracas, Venezuela"
                                                     />
                                                 </div>
                                             </div>
@@ -957,7 +959,7 @@ const CreateAuction = () => {
                                                         id="video"
                                                         type="url"
                                                         className="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                                                        placeholder="YouTube video URL (walkaround, test drive)"
+                                                        placeholder="YouTube video URL"
                                                     />
                                                 </div>
                                                 {errors.video && <p className="text-red-500 text-sm mt-1">{errors.video.message}</p>}
@@ -1052,7 +1054,7 @@ const CreateAuction = () => {
                                                 <label htmlFor="document-upload" className="cursor-pointer">
                                                     <File size={40} className="mx-auto text-gray-400 mb-2" />
                                                     <p className="text-gray-600">Browse document(s) to upload</p>
-                                                    <p className="text-sm text-secondary">Title, registration, maintenance records, ownership docs</p>
+                                                    <p className="text-sm text-secondary">Attach documents if you have any.</p>
                                                 </label>
                                             </div>
 
@@ -1074,7 +1076,7 @@ const CreateAuction = () => {
                                             )}
                                         </div>
 
-                                        <div className="mb-6">
+                                        {/* <div className="mb-6">
                                             <label htmlFor="service-upload" className="block text-sm font-medium text-secondary mb-1">
                                                 Service History Images
                                             </label>
@@ -1101,7 +1103,7 @@ const CreateAuction = () => {
                                                     removeServiceRecord={removeServiceRecord}
                                                 />
                                             )}
-                                        </div>
+                                        </div> */}
                                     </div>
                                 )}
 
@@ -1115,12 +1117,12 @@ const CreateAuction = () => {
 
                                         <div className="mb-6">
                                             <label className="block text-sm font-medium text-secondary mb-1">Auction Type *</label>
-                                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4"> {/* Changed from grid-cols-3 to grid-cols-4 */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> {/* Changed from grid-cols-3 to grid-cols-4 */}
                                                 {[
                                                     { value: 'standard', label: 'Standard Auction' },
                                                     { value: 'reserve', label: 'Reserve Price Auction' },
-                                                    { value: 'buy_now', label: 'Buy Now Auction' },
-                                                    { value: 'giveaway', label: 'Free Giveaway' }, // ADD THIS LINE
+                                                    // { value: 'buy_now', label: 'Buy Now Auction' },
+                                                    // { value: 'giveaway', label: 'Free Giveaway' },
                                                 ].map((type) => (
                                                     <label key={type.value} className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
                                                         <input
@@ -1154,7 +1156,7 @@ const CreateAuction = () => {
                                                         <div>
                                                             <label htmlFor="startPrice" className="block text-sm font-medium text-secondary mb-1">Start Price *</label>
                                                             <div className="relative">
-                                                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600">kr</span>
+                                                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600">$</span>
                                                                 <input
                                                                     {...register('startPrice', {
                                                                         required: watch('auctionType') !== 'giveaway' ? 'Start price is required' : false,
@@ -1175,7 +1177,7 @@ const CreateAuction = () => {
                                                         <div>
                                                             <label htmlFor="bidIncrement" className="block text-sm font-medium text-secondary mb-1">Bid Increment *</label>
                                                             <div className="relative">
-                                                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600">kr</span>
+                                                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600">$</span>
                                                                 <input
                                                                     {...register('bidIncrement', {
                                                                         required: (watch('auctionType') === 'standard' || watch('auctionType') === 'reserve') ? 'Bid increment is required' : false,
@@ -1198,7 +1200,7 @@ const CreateAuction = () => {
                                                     <div className="mb-6">
                                                         <label htmlFor="reservePrice" className="block text-sm font-medium text-secondary mb-1">Reserve Price *</label>
                                                         <div className="relative">
-                                                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600">kr</span>
+                                                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600">$</span>
                                                             <input
                                                                 {...register('reservePrice', {
                                                                     required: watch('auctionType') === 'reserve' ? 'Reserve price is required' : false,
@@ -1228,7 +1230,7 @@ const CreateAuction = () => {
                                                             Buy Now Price *
                                                         </label>
                                                         <div className="relative">
-                                                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600">kr</span>
+                                                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600">$</span>
                                                             <input
                                                                 {...register('buyNowPrice', {
                                                                     required: watch('auctionType') === 'buy_now' ? 'Buy Now price is required' : false,
@@ -1514,7 +1516,7 @@ const CreateAuction = () => {
                                                 e.preventDefault();
                                                 nextStep();
                                             }}
-                                            className="flex items-center px-6 py-2 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white hover:from-orange-500 hover:via-orange-600 hover:to-orange-700 rounded-lg transition-colors"
+                                            className="flex items-center px-6 py-2 bg-[#C59D55] text-white hover:bg-[#C59D55]/90 rounded-lg transition-colors"
                                         >
                                             Next
                                             <ArrowRight size={18} className="ml-2" />
@@ -1522,7 +1524,7 @@ const CreateAuction = () => {
                                     ) : (
                                         <button
                                             type="submit"
-                                            className="flex items-center px-6 py-2 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white hover:from-orange-500 hover:via-orange-600 hover:to-orange-700 rounded-lg transition-colors"
+                                            className="flex items-center px-6 py-2 bg-[#C59D55] text-white hover:bg-[#C59D55]/90 rounded-lg transition-colors"
                                         >
                                             <Gavel size={18} className="mr-2" />
                                             {isLoading ? 'Creating Auction...' : 'Create Auction'}

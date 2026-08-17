@@ -48,9 +48,9 @@ const MakeOfferModal = ({
 
     if (!isOpen) return null;
 
-    const formatNOK = (amount) => {
-        if (!amount && amount !== 0) return "0 kr";
-        return `${Number(amount).toLocaleString("nb-NO")} kr`;
+    const formatUSD = (amount) => {
+        if (!amount && amount !== 0) return "$0";
+        return `$${Number(amount).toLocaleString("en-US")}`;
     };
 
     const total = Number(offerAmount || 0) + Number(serviceFee);
@@ -105,7 +105,7 @@ const MakeOfferModal = ({
                         </div>
 
                         {auction?.startPrice && auction?.startPrice > 0 && <p className="text-sm text-gray-500 mt-1">
-                            Minimum offer: {formatNOK(auction?.startPrice)}
+                            Minimum offer: {formatUSD(auction?.startPrice)}
                         </p>}
                     </div>
 
@@ -114,17 +114,17 @@ const MakeOfferModal = ({
                         <div className="bg-gray-50 rounded-lg p-4 mb-6 space-y-2">
                             <div className="flex justify-between text-gray-700">
                                 <span>Offer Amount</span>
-                                <span>{formatNOK(offerAmount)}</span>
+                                <span>{formatUSD(offerAmount)}</span>
                             </div>
 
                             <div className="flex justify-between text-gray-700">
                                 <span>Service Fee</span>
-                                <span>{formatNOK(serviceFee)}</span>
+                                <span>{formatUSD(serviceFee)}</span>
                             </div>
 
                             <div className="border-t pt-2 flex justify-between font-semibold text-green-600">
                                 <span>Total Payable</span>
-                                <span>{formatNOK(total)}</span>
+                                <span>{formatUSD(total)}</span>
                             </div>
                         </div>
                     )}

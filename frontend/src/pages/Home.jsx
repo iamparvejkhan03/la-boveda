@@ -79,15 +79,15 @@ function Home() {
     };
 
     const tabTitles = {
-        'active': 'Live Auctions',
-        'sold': 'Closed Auctions',
-        'approved': 'Upcoming Auctions'
+        'active': 'Live',
+        'sold': 'Closed',
+        'approved': 'Upcoming'
     };
 
     const tabDescriptions = {
-        'active': 'Handpicked heavy equipment. Clear bidding. Verified listings. — find your perfect machine today.',
-        'sold': 'Learn from past auctions — browse sold and reserve-not-met listings to bid smarter on your next machine.',
-        'approved': 'Plan your next move — browse upcoming heavy equipment auctions and build your bidding strategy in advance.'
+        'active': 'Handpicked collectibles. Transparent bidding. Verified authenticity. — find your next treasure today.',
+        'sold': 'Learn from past auctions — browse sold and reserve-not-met listings to bid smarter on your next piece.',
+        'approved': 'Plan your next move — browse upcoming collectible auctions and build your bidding strategy in advance.'
     };
 
     const fetchAuctions = async (tab = activeTab, category = null, limit = 4, sortBy = 'highestBid') => {
@@ -145,7 +145,7 @@ function Home() {
             <Hero />
 
             {/* Marquee section */}
-            <Container>
+            {/* <Container>
                 <Marquee speed={50} gradient={false}>
                     <div className="flex gap-8 w-full my-14 mr-8">
                         {
@@ -161,7 +161,7 @@ function Home() {
                         }
                     </div>
                 </Marquee>
-            </Container>
+            </Container> */}
 
             {/* Category section */}
             <Suspense fallback={<LoadingSpinner />}>
@@ -169,10 +169,16 @@ function Home() {
             </Suspense>
 
             {/* Dynamic Auctions section */}
-            <Container className="mb-14 flex flex-col">
+            <Container className="flex flex-col">
                 <div className="gap-y-3">
                     <div className="flex items-center justify-between flex-wrap gap-y-3">
-                        <h2 className="text-3xl md:text-4xl font-bold text-primary order-1">{tabTitles[activeTab]}</h2>
+                        {/* <h2 className="text-3xl md:text-4xl font-bold text-primary order-1">{tabTitles[activeTab]}</h2> */}
+                        <h2 className="max-w-2xl text-4xl font-black leading-[1.05] tracking-[-0.035em] text-[#111315] sm:text-5xl lg:text-[48px]">
+                            {tabTitles[activeTab]}
+                            <span className="ml-2 font-medium italic text-gray-400">
+                                Auctions
+                            </span>
+                        </h2>
                         <div className="flex items-center  flex-wrap gap-5 order-2 mb-3">
                             <div className="flex space-x-2 bg-white p-1 border border-gray-500/50 rounded-md text-sm">
                                 <div className="flex items-center">
@@ -184,7 +190,7 @@ function Home() {
                                         checked={activeTab === 'active'}
                                         onChange={() => handleTabChange('active')}
                                     />
-                                    <label htmlFor="active" className="cursor-pointer rounded py-2 px-4 sm:px-8 text-[#1e2d3b] transition-colors duration-200 peer-checked:bg-gradient-to-r peer-checked:from-amber-400 peer-checked:via-amber-500 peer-checked:to-amber-600 peer-checked:text-white">
+                                    <label htmlFor="active" className="cursor-pointer rounded py-2 px-4 sm:px-8 text-[#1e2d3b] transition-colors duration-200 peer-checked:bg-[#C59D55] peer-checked:text-white">
                                         Live
                                     </label>
                                 </div>
@@ -197,7 +203,7 @@ function Home() {
                                         checked={activeTab === 'sold'}
                                         onChange={() => handleTabChange('sold')}
                                     />
-                                    <label htmlFor="sold" className="cursor-pointer rounded py-2 px-4 sm:px-8 text-gray-500 transition-colors duration-200 peer-checked:bg-gradient-to-r peer-checked:from-amber-400 peer-checked:via-amber-500 peer-checked:to-amber-600 peer-checked:text-white">
+                                    <label htmlFor="sold" className="cursor-pointer rounded py-2 px-4 sm:px-8 text-gray-500 transition-colors duration-200 peer-checked:bg-[#C59D55] peer-checked:text-white">
                                         Closed
                                     </label>
                                 </div>
@@ -210,14 +216,14 @@ function Home() {
                                         checked={activeTab === 'approved'}
                                         onChange={() => handleTabChange('approved')}
                                     />
-                                    <label htmlFor="approved" className="cursor-pointer rounded py-2 px-4 sm:px-8 text-gray-500 transition-colors duration-200 peer-checked:bg-gradient-to-r peer-checked:from-amber-400 peer-checked:via-amber-500 peer-checked:to-amber-600 peer-checked:text-white">
+                                    <label htmlFor="approved" className="cursor-pointer rounded py-2 px-4 sm:px-8 text-gray-500 transition-colors duration-200 peer-checked:bg-[#C59D55] peer-checked:text-white">
                                         Upcoming
                                     </label>
                                 </div>
                             </div>
 
                             {/* Add this view mode toggle */}
-                            <div className="hidden md:flex items-center gap-2 bg-gray-100 p-1 rounded-lg">
+                            {/* <div className="hidden md:flex items-center gap-2 bg-gray-100 p-1 rounded-lg">
                                 <button
                                     onClick={() => setViewMode("grid")}
                                     className={`p-2 rounded transition-colors ${viewMode === "grid" ? "bg-white shadow-sm" : "hover:bg-gray-200"}`}
@@ -232,7 +238,7 @@ function Home() {
                                 >
                                     <List size={18} className={viewMode === "list" ? "text-orange-600" : "text-gray-500"} />
                                 </button>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                     <p className="text-sm md:text-base text-gray-500 order-2 md:order-3">
@@ -322,7 +328,7 @@ function Home() {
                         {auctions.length > 0 && (
                             <button
                                 onClick={handleLoadByStatus}
-                                className="px-8 py-3 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 text-white font-medium rounded-lg hover:bg-gradient-to-r hover:from-amber-500 hover:via-amber-600 hover:to-amber-700 focus:outline-none focus:ring-2 focus:ring-orange-600 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 mt-10 mx-auto"
+                                className="px-8 py-3 bg-[#C59D55] text-white font-medium rounded-lg transition-all duration-300 hover:bg-[#D8B96F] hover:shadow-[0_0_35px_rgba(197,157,85,0.25)] focus:outline-none focus:ring-2 focus:ring-[#C59D55] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 mt-10 mx-auto"
                             >
                                 View More
                             </button>

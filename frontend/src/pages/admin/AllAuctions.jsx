@@ -292,16 +292,16 @@ function AllAuctions() {
     };
 
     const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('nb-NO', {
+        return new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: 'NOK',
+            currency: 'USD',
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         }).format(amount);
     };
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('nb-NO', {
+        return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
@@ -357,7 +357,7 @@ function AllAuctions() {
                                 </div>
                                 <Link
                                     to="/admin/auctions/create"
-                                    className="bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white hover:from-orange-500 hover:via-orange-600 hover:to-orange-700 px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
+                                    className="bg-[#C59D55] text-white hover:bg-[#C59D55]/90 px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
                                 >
                                     <Plus size={18} />
                                     Create Auction
@@ -369,23 +369,23 @@ function AllAuctions() {
                     {/* Stats Overview */}
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
                         <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-                            <div className="text-2xl font-bold text-gray-900">{stats.total?.toLocaleString('nb-NO')}</div>
+                            <div className="text-2xl font-bold text-gray-900">{stats.total?.toLocaleString('en-US')}</div>
                             <div className="text-sm text-gray-500">Total Auctions</div>
                         </div>
                         <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-                            <div className="text-2xl font-bold text-green-600">{stats.active?.toLocaleString('nb-NO')}</div>
+                            <div className="text-2xl font-bold text-green-600">{stats.active?.toLocaleString('en-US')}</div>
                             <div className="text-sm text-gray-500">Active</div>
                         </div>
                         <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-                            <div className="text-2xl font-bold text-amber-600">{stats.pending?.toLocaleString('nb-NO')}</div>
+                            <div className="text-2xl font-bold text-amber-600">{stats.pending?.toLocaleString('en-US')}</div>
                             <div className="text-sm text-gray-500">Pending</div>
                         </div>
                         {/* <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-                            <div className="text-2xl font-bold text-purple-600">{stats.featured?.toLocaleString('nb-NO')}</div>
+                            <div className="text-2xl font-bold text-purple-600">{stats.featured?.toLocaleString('en-US')}</div>
                             <div className="text-sm text-gray-500">Featured</div>
                         </div> */}
                         <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-                            <div className="text-2xl font-bold text-blue-600">{stats.sold?.toLocaleString('nb-NO')}</div>
+                            <div className="text-2xl font-bold text-blue-600">{stats.sold?.toLocaleString('en-US')}</div>
                             <div className="text-sm text-gray-500">Sold</div>
                         </div>
                     </div>

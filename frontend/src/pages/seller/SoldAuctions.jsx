@@ -66,23 +66,23 @@ function SoldAuctions() {
 
     const formatTime = (dateString) => {
         if (!dateString) return "N/A";
-        return new Date(dateString).toLocaleTimeString('nb-NO', {
+        return new Date(dateString).toLocaleTimeString('en-US', {
             hour: '2-digit',
             minute: '2-digit'
         });
     };
 
     const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('nb-NO', {
+        return new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: 'NOK',
+            currency: 'USD',
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         }).format(amount);
     };
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('nb-NO', {
+        return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
@@ -145,7 +145,7 @@ function SoldAuctions() {
                                 <p>{error}</p>
                                 <button
                                     onClick={fetchSoldAuctions}
-                                    className="mt-4 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-500"
+                                    className="mt-4 bg-[#C59D55] text-white px-4 py-2 rounded-lg hover:bg-[#C59D55]/90"
                                 >
                                     Try Again
                                 </button>
@@ -300,6 +300,12 @@ function SoldAuctions() {
                                                 </div>
                                             </div>
                                         </div>
+                                        <Link
+                                            to={`/seller/communication/${selectedAuction.id}`}
+                                            className="flex-1 text-center border border-[#C59D55] text-[#C59D55] hover:bg-[#C59D55] hover:text-white py-3 px-6 rounded-lg font-semibold transition-all"
+                                        >
+                                            Communication
+                                        </Link>
                                         {/* <div>
                                             <button
                                                 onClick={() => openUserModal(selectedAuction.winner)}

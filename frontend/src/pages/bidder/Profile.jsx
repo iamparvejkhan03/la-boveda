@@ -238,7 +238,7 @@ function Profile() {
                             <p className="text-red-600">Failed to load profile data</p>
                             <button
                                 onClick={fetchUserData}
-                                className="mt-4 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white hover:from-orange-500 hover:via-orange-600 hover:to-orange-700 px-4 py-2 rounded-lg"
+                                className="mt-4 bg-[#C59D55] text-white hover:bg-[#C59D55]/90 px-4 py-2 rounded-lg"
                             >
                                 Try Again
                             </button>
@@ -279,7 +279,7 @@ function Profile() {
                                             key={section.id}
                                             onClick={() => setActiveSection(section.id)}
                                             className={`flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${activeSection === section.id
-                                                ? `text-white bg-orange-500 font-medium`
+                                                ? `text-white bg-[#C59D55] font-medium`
                                                 : "text-secondary hover:bg-gray-100"
                                                 }`}
                                         >
@@ -306,7 +306,7 @@ function Profile() {
                                                     <button
                                                         onClick={handleSave}
                                                         disabled={saving}
-                                                        className="flex items-center gap-2 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white hover:from-orange-500 hover:via-orange-600 hover:to-orange-700 px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+                                                        className="flex items-center gap-2 bg-[#C59D55] text-white hover:bg-[#C59D55]/90 px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
                                                     >
                                                         <Save size={16} />
                                                         {saving ? 'Saving...' : 'Save Changes'}
@@ -323,7 +323,7 @@ function Profile() {
                                             ) : (
                                                 <button
                                                     onClick={() => setIsEditing(true)}
-                                                    className="flex items-center gap-2 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white hover:from-orange-500 hover:via-orange-600 hover:to-orange-700 px-4 py-2 rounded-lg transition-colors"
+                                                    className="flex items-center gap-2 bg-[#C59D55] text-white hover:bg-[#C59D55]/90 px-4 py-2 rounded-lg transition-colors"
                                                 >
                                                     <Edit size={16} />
                                                     Edit
@@ -443,7 +443,7 @@ function Profile() {
                                                     <label className="block text-sm font-medium text-secondary">Member Since</label>
                                                     <input
                                                         type="text"
-                                                        value={new Date(userData.createdAt).toLocaleDateString('nb-NO')}
+                                                        value={new Date(userData.createdAt).toLocaleDateString('en-US')}
                                                         disabled
                                                         className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-100"
                                                     />
@@ -532,7 +532,7 @@ function Profile() {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">Total Bids</p>
-                                            <p className="font-semibold text-lg">{stats.totalBids?.toLocaleString('nb-NO') || 0}</p>
+                                            <p className="font-semibold text-lg">{stats.totalBids?.toLocaleString('en-US') || 0}</p>
                                         </div>
                                     </div> */}
                                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex items-center">
@@ -541,7 +541,7 @@ function Profile() {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">Total Offers</p>
-                                            <p className="font-semibold text-lg">{stats.totalOffers?.toLocaleString('nb-NO') || 0}</p>
+                                            <p className="font-semibold text-lg">{stats.totalOffers?.toLocaleString('en-US') || 0}</p>
                                         </div>
                                     </div>
                                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex items-center">
@@ -550,7 +550,7 @@ function Profile() {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">Auctions Won</p>
-                                            <p className="font-semibold text-lg">{stats.wonAuctions?.toLocaleString('nb-NO') || 0}</p>
+                                            <p className="font-semibold text-lg">{stats.wonAuctions?.toLocaleString('en-US') || 0}</p>
                                         </div>
                                     </div>
                                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex items-center">
@@ -559,7 +559,7 @@ function Profile() {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">Success Rate</p>
-                                            <p className="font-semibold text-lg">{stats.successRate?.toLocaleString('nb-NO') || 0}%</p>
+                                            <p className="font-semibold text-lg">{stats.successRate?.toLocaleString('en-US') || 0}%</p>
                                         </div>
                                     </div>
                                     {/* Additional bidder stats */}
@@ -569,7 +569,7 @@ function Profile() {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">Active Bids</p>
-                                            <p className="font-semibold text-lg">{stats.activeBids?.toLocaleString('nb-NO') || 0}</p>
+                                            <p className="font-semibold text-lg">{stats.activeBids?.toLocaleString('en-US') || 0}</p>
                                         </div>
                                     </div> */}
                                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex items-center">
@@ -578,7 +578,7 @@ function Profile() {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">Active Offers</p>
-                                            <p className="font-semibold text-lg">{stats.activeOffers?.toLocaleString('nb-NO') || 0}</p>
+                                            <p className="font-semibold text-lg">{stats.activeOffers?.toLocaleString('en-US') || 0}</p>
                                         </div>
                                     </div>
                                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex items-center">
@@ -587,7 +587,7 @@ function Profile() {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">Watchlist Items</p>
-                                            <p className="font-semibold text-lg">{stats.watchlistCount?.toLocaleString('nb-NO') || 0}</p>
+                                            <p className="font-semibold text-lg">{stats.watchlistCount?.toLocaleString('en-US') || 0}</p>
                                         </div>
                                     </div>
                                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex items-center">
@@ -597,11 +597,11 @@ function Profile() {
                                         <div>
                                             <p className="text-sm text-gray-500">Total Spent</p>
                                             <p className="font-semibold text-lg">
-                                                {new Intl.NumberFormat('nb-NO', {
+                                                {new Intl.NumberFormat('en-US', {
                                                     style: 'currency',
-                                                    currency: 'NOK',
+                                                    currency: 'USD',
                                                     minimumFractionDigits: 0
-                                                }).format(stats.totalSpent?.toLocaleString('nb-NO')) || 0}
+                                                }).format(stats.totalSpent?.toLocaleString('en-US')) || 0}
                                             </p>
                                         </div>
                                     </div>
@@ -710,7 +710,7 @@ const PasswordChangeForm = ({ onChangePassword, saving }) => {
                 <button
                     type="submit"
                     disabled={saving}
-                    className="bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white hover:from-orange-500 hover:via-orange-600 hover:to-orange-700 px-6 py-3 rounded-lg transition-colors disabled:opacity-50"
+                    className="bg-[#C59D55] text-white hover:bg-[#C59D55]/90 px-6 py-3 rounded-lg transition-colors disabled:opacity-50"
                 >
                     {saving ? 'Changing Password...' : 'Change Password'}
                 </button>

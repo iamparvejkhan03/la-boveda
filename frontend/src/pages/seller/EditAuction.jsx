@@ -807,6 +807,7 @@ const EditAuction = () => {
 
     const nextStep = async () => {
         let isValid = true;
+        scrollTo({top: 0, behavior: 'smooth'});
 
         if (step === 1) {
             const fieldsToValidate = ['title', 'category', 'description', 'startDate', 'endDate'];
@@ -872,6 +873,7 @@ const EditAuction = () => {
 
     const prevStep = () => {
         setStep(step - 1);
+        scrollTo({top: 0, behavior: 'smooth'});
     };
 
     // Fixed handlePhotoUpload function
@@ -1312,7 +1314,7 @@ const EditAuction = () => {
                                             Item Information
                                         </h2>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-6">
                                             <div>
                                                 <label htmlFor="title" className="block text-sm font-medium text-secondary mb-1">Item Name *</label>
                                                 <input
@@ -1320,7 +1322,7 @@ const EditAuction = () => {
                                                     id="title"
                                                     type="text"
                                                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                                                    placeholder="e.g., 2017 VANS RV-6A"
+                                                    placeholder="e.g., 1985 Star Co. Michael Jordan #117 BGS Gem Mint 9.5"
                                                 />
                                                 {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
                                             </div>
@@ -1464,7 +1466,7 @@ const EditAuction = () => {
                                                         id="location"
                                                         type="text"
                                                         className="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                                                        placeholder="e.g., Dallas, Texas"
+                                                        placeholder="e.g., Altamira, Caracas, Venezuela"
                                                     />
                                                 </div>
                                             </div>
@@ -1543,7 +1545,7 @@ const EditAuction = () => {
                                                 <label htmlFor="photo-upload" className="cursor-pointer">
                                                     <Image size={40} className="mx-auto text-gray-400 mb-2" />
                                                     <p className="text-gray-600">Browse photo(s) to upload</p>
-                                                    <p className="text-sm text-secondary">Recommended: at least 40 high-quality photos</p>
+                                                    {/* <p className="text-sm text-secondary">Recommended: at least 40 high-quality photos</p> */}
                                                 </label>
                                             </div>
                                             {errors.photos && <p className="text-red-500 text-sm mt-1">{errors.photos.message}</p>}
@@ -1573,7 +1575,7 @@ const EditAuction = () => {
                                                 <label htmlFor="document-upload" className="cursor-pointer">
                                                     <File size={40} className="mx-auto text-gray-400 mb-2" />
                                                     <p className="text-gray-600">Browse document(s) to upload</p>
-                                                    <p className="text-sm text-secondary">service Records, maintenance records, ownership docs, etc.</p>
+                                                    <p className="text-sm text-secondary">Attach documents if you have any.</p>
                                                 </label>
                                             </div>
 
@@ -1641,7 +1643,7 @@ const EditAuction = () => {
                                         </div>
 
                                         {/* Service History Images Section */}
-                                        <div className="mb-6">
+                                        {/* <div className="mb-6">
                                             <label htmlFor="service-upload" className="block text-sm font-medium text-secondary mb-1">
                                                 Service History Images *
                                             </label>
@@ -1661,7 +1663,6 @@ const EditAuction = () => {
                                                 </label>
                                             </div>
 
-                                            {/* Unified Service History Gallery with Drag & Drop */}
                                             {allServiceRecords.length > 0 && (
                                                 <div className="mt-4">
                                                     <p className="text-sm text-secondary mb-3">
@@ -1685,7 +1686,7 @@ const EditAuction = () => {
                                                     </div>
                                                 </div>
                                             )}
-                                        </div>
+                                        </div> */}
                                     </div>
                                 )}
 
@@ -1699,12 +1700,12 @@ const EditAuction = () => {
 
                                         <div className="mb-6">
                                             <label className="block text-sm font-medium text-secondary mb-1">Auction Type *</label>
-                                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4"> {/* Changed from grid-cols-3 to grid-cols-4 */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> {/* Changed from grid-cols-3 to grid-cols-4 */}
                                                 {[
                                                     { value: 'standard', label: 'Standard Auction' },
                                                     { value: 'reserve', label: 'Reserve Price Auction' },
-                                                    { value: 'buy_now', label: 'Buy Now Auction' },
-                                                    { value: 'giveaway', label: 'Free Giveaway' }, // ADD THIS LINE
+                                                    // { value: 'buy_now', label: 'Buy Now Auction' },
+                                                    // { value: 'giveaway', label: 'Free Giveaway' },
                                                 ].map((type) => (
                                                     <label key={type.value} className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
                                                         <input
@@ -1738,7 +1739,7 @@ const EditAuction = () => {
                                                         <div>
                                                             <label htmlFor="startPrice" className="block text-sm font-medium text-secondary mb-1">Start Price *</label>
                                                             <div className="relative">
-                                                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600">kr</span>
+                                                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600">$</span>
                                                                 <input
                                                                     {...register('startPrice', {
                                                                         required: watch('auctionType') !== 'giveaway' ? 'Start price is required' : false,
@@ -1759,7 +1760,7 @@ const EditAuction = () => {
                                                         <div>
                                                             <label htmlFor="bidIncrement" className="block text-sm font-medium text-secondary mb-1">Bid Increment *</label>
                                                             <div className="relative">
-                                                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600">kr</span>
+                                                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600">$</span>
                                                                 <input
                                                                     {...register('bidIncrement', {
                                                                         required: (watch('auctionType') === 'standard' || watch('auctionType') === 'reserve') ? 'Bid increment is required' : false,
@@ -1782,7 +1783,7 @@ const EditAuction = () => {
                                                     <div className="mb-6">
                                                         <label htmlFor="reservePrice" className="block text-sm font-medium text-secondary mb-1">Reserve Price *</label>
                                                         <div className="relative">
-                                                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600">kr</span>
+                                                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600">$</span>
                                                             <input
                                                                 {...register('reservePrice', {
                                                                     required: watch('auctionType') === 'reserve' ? 'Reserve price is required' : false,
@@ -1812,7 +1813,7 @@ const EditAuction = () => {
                                                             Buy Now Price *
                                                         </label>
                                                         <div className="relative">
-                                                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600">kr</span>
+                                                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600">$</span>
                                                             <input
                                                                 {...register('buyNowPrice', {
                                                                     required: watch('auctionType') === 'buy_now' ? 'Buy Now price is required' : false,
@@ -1917,47 +1918,6 @@ const EditAuction = () => {
                                                         </div>
                                                     </div>
 
-                                                    {selectedCategory && (
-                                                        <div className="space-y-4">
-                                                            {/* Item Information Review */}
-                                                            <div className="bg-white p-4 rounded-lg shadow-sm">
-                                                                <h4 className="font-medium mb-3">Item Information</h4>
-                                                                <div className="grid grid-cols-2 gap-4">
-                                                                    {['registration', 'miles', 'year', 'bodyType', 'transmission', 'fuelType', 'colour'].map((fieldName) => {
-                                                                        const field = getCategoryFields().find(f => f.name === fieldName);
-                                                                        const value = watch(`specifications.${fieldName}`);
-                                                                        return value ? (
-                                                                            <div key={fieldName}>
-                                                                                <p className="text-xs text-secondary">{field?.label}</p>
-                                                                                <p className="font-medium">{value}</p>
-                                                                            </div>
-                                                                        ) : null;
-                                                                    }).filter(Boolean)}
-                                                                </div>
-                                                            </div>
-
-                                                            {/* Extra Information Review */}
-                                                            <div className="bg-white p-4 rounded-lg shadow-sm">
-                                                                <h4 className="font-medium mb-3">Extra Information</h4>
-                                                                <div className="grid grid-cols-2 gap-4">
-                                                                    {['keys', 'motExpiry', 'serviceHistory', 'insuranceCategory', 'v5Status', 'previousOwners', 'vatStatus', 'capClean', 'vendor'].map((fieldName) => {
-                                                                        const field = getCategoryFields().find(f => f.name === fieldName);
-                                                                        const value = watch(`specifications.${fieldName}`);
-                                                                        return value ? (
-                                                                            <div key={fieldName}>
-                                                                                <p className="text-xs text-secondary">{field?.label}</p>
-                                                                                <p className="font-medium">{fieldName === 'motExpiry' ? new Date(value).toLocaleDateString('nb-NO') : value}</p>
-                                                                            </div>
-                                                                        ) : null;
-                                                                    }).filter(Boolean)}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                {/* Auction Details */}
-                                                <div className="space-y-4">
                                                     <div className="bg-white p-4 rounded-lg shadow-sm">
                                                         <h4 className="font-medium mb-3">Auction Details</h4>
                                                         <div className="space-y-2">
@@ -1979,18 +1939,21 @@ const EditAuction = () => {
                                                             <div>
                                                                 <p className="text-xs text-secondary">Start Date</p>
                                                                 <p className="font-medium">
-                                                                    {watch('startDate') ? new Date(watch('startDate')).toLocaleString('nb-NO') : 'Not provided'}
+                                                                    {watch('startDate') ? new Date(watch('startDate')).toLocaleString('en-US') : 'Not provided'}
                                                                 </p>
                                                             </div>
                                                             <div>
                                                                 <p className="text-xs text-secondary">End Date</p>
                                                                 <p className="font-medium">
-                                                                    {watch('endDate') ? new Date(watch('endDate')).toLocaleString('nb-NO') : 'Not provided'}
+                                                                    {watch('endDate') ? new Date(watch('endDate')).toLocaleString('en-US') : 'Not provided'}
                                                                 </p>
                                                             </div>
                                                         </div>
                                                     </div>
+                                                </div>
 
+                                                {/* Auction Details */}
+                                                <div className="space-y-4">
                                                     {/* Media - UPDATED for edit page */}
                                                     <div className="bg-white p-4 rounded-lg shadow-sm">
                                                         <h4 className="font-medium mb-3">Media & Documents</h4>
@@ -2043,28 +2006,28 @@ const EditAuction = () => {
                                                             {(watch('auctionType') === 'standard' || watch('auctionType') === 'reserve' || watch('auctionType') === 'buy_now') && (
                                                                 <div>
                                                                     <p className="text-xs text-secondary">Start Price</p>
-                                                                    <p className="font-medium">{watch('startPrice') || '0.00'} kr</p>
+                                                                    <p className="font-medium">${watch('startPrice') || '0.00'}</p>
                                                                 </div>
                                                             )}
 
                                                             {(watch('auctionType') === 'standard' || watch('auctionType') === 'reserve') && (
                                                                 <div>
                                                                     <p className="text-xs text-secondary">Bid Increment</p>
-                                                                    <p className="font-medium">{watch('bidIncrement') || '0.00'} kr</p>
+                                                                    <p className="font-medium">${watch('bidIncrement') || '0.00'}</p>
                                                                 </div>
                                                             )}
 
                                                             {watch('auctionType') === 'reserve' && (
                                                                 <div>
                                                                     <p className="text-xs text-secondary">Reserve Price</p>
-                                                                    <p className="font-medium text-green-600">{watch('reservePrice') || '0.00'} kr</p>
+                                                                    <p className="font-medium text-green-600">${watch('reservePrice') || '0.00'}</p>
                                                                 </div>
                                                             )}
 
                                                             {watch('auctionType') === 'buy_now' && (
                                                                 <div>
                                                                     <p className="text-xs text-secondary">Buy Now Price</p>
-                                                                    <p className="font-medium text-blue-600">{watch('buyNowPrice') || '0.00'} kr</p>
+                                                                    <p className="font-medium text-blue-600">${watch('buyNowPrice') || '0.00'}</p>
                                                                 </div>
                                                             )}
                                                         </div>
@@ -2124,7 +2087,7 @@ const EditAuction = () => {
                                                 e.preventDefault();
                                                 nextStep();
                                             }}
-                                            className="flex items-center px-6 py-2 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white hover:from-orange-500 hover:via-orange-600 hover:to-orange-700 rounded-lg transition-colors"
+                                            className="flex items-center px-6 py-2 bg-[#C59D55] text-white hover:bg-[#C59D55]/90 rounded-lg transition-colors"
                                         >
                                             Next
                                             <ArrowRight size={18} className="ml-2" />
@@ -2133,7 +2096,7 @@ const EditAuction = () => {
                                         <button
                                             type="submit"
                                             disabled={isSubmitting}
-                                            className="flex items-center px-6 py-2 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 text-white hover:from-orange-500 hover:via-orange-600 hover:to-orange-700 rounded-lg transition-colors disabled:opacity-50"
+                                            className="flex items-center px-6 py-2 bg-[#C59D55] text-white hover:bg-[#C59D55]/90 rounded-lg transition-colors disabled:opacity-50"
                                         >
                                             <Gavel size={18} className="mr-2" />
                                             {isSubmitting ? 'Updating Auction...' : 'Update Auction'}

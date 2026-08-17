@@ -836,6 +836,7 @@ export const getCategoriesWithImages = async (req, res) => {
       name: category.name,
       slug: category.slug,
       image: category.image?.url,
+      icon: category.icon?.url,
       order: category.order,
       auctionCount: category.auctionCount,
     }));
@@ -1040,7 +1041,7 @@ export const getParentCategoriesWithImages = async (req, res) => {
             image: { $exists: true, $ne: null }, // Only categories with images
             'image.url': { $exists: true, $ne: '' }
         })
-        .select('name slug image order auctionCount')
+        .select('name slug image icon order auctionCount')
         .sort({ order: 1, name: 1 })
         .limit(20);
 
@@ -1049,6 +1050,7 @@ export const getParentCategoriesWithImages = async (req, res) => {
             name: category.name,
             slug: category.slug,
             image: category.image?.url,
+            icon: category.icon?.url,
             order: category.order,
             auctionCount: category.auctionCount
         }));

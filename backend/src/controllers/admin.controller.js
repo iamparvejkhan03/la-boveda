@@ -18,6 +18,7 @@ import {
   paymentCompletedSellerEmail,
   sendBulkAuctionNotifications,
 } from "../utils/nodemailer.js";
+import Payment from "../models/payment.model.js";
 
 export const getAdminStats = async (req, res) => {
   try {
@@ -1970,6 +1971,8 @@ export const updatePaymentStatus = async (req, res) => {
     const updatedAuction = await Auction.findById(id)
       .populate("seller", "username firstName lastName email phone address")
       .populate("winner", "username firstName lastName email phone address");
+
+    const updatedPayment = await Payment.findOneAndUpdate({auction: updatedAuction?._id}, {status: paymentStatus, processedBy: admin})
 
     res.status(200).json({
       success: true,
