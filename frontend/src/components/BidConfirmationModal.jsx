@@ -77,7 +77,7 @@ const BidConfirmationModal = forwardRef((props, ref) => {
                 </div>
 
                 {/* Bid Details */}
-                <div className="py-3 px-6 md:p-6 border-b border-gray-200">
+                <div className="py-3 px-6 md:px-6 border-b border-gray-200">
                     <table className="w-full">
                         <tbody>
                             <tr>
@@ -87,7 +87,7 @@ const BidConfirmationModal = forwardRef((props, ref) => {
                                 </td>
                             </tr>
                             <tr>
-                                <td className="py-2 text-gray-600">Service Fee:</td>
+                                <td className="py-2 text-gray-600">Service Fee ({commissionType == 'percentage' ? `${commissionValue}%` : `$${commissionValue}`}):</td>
                                 <td className="py-2 text-right text-gray-900">
                                     {formatUSD(serviceFee)}
                                 </td>
@@ -100,6 +100,7 @@ const BidConfirmationModal = forwardRef((props, ref) => {
                             </tr>
                         </tbody>
                     </table>
+                    <p className="text-xs text-gray-500 text-center">Note: {commissionType == 'percentage' ? `${commissionValue}%` : `$${commissionValue}`} service fee will be applied on the winning bid amount.</p>
                 </div>
 
                 {/* Information Text */}

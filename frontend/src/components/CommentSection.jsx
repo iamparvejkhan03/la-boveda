@@ -328,10 +328,10 @@ const CommentSection = ({ auctionId }) => {
                                                         </button>
                                                     </>
                                                 )}
-                                                <button onClick={() => handleReport(comment._id)} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                                                {/* <button onClick={() => handleReport(comment._id)} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
                                                     <Flag size={14} />
                                                     Report
-                                                </button>
+                                                </button> */}
                                             </div>
                                         </div>
                                     </div>
@@ -380,10 +380,10 @@ const CommentSection = ({ auctionId }) => {
                                             <span>{comment?.likeCount || comment?.likes.length}</span>
                                         </button>
 
-                                        <button onClick={() => handleReport(comment._id)} className="flex items-center gap-1 hover:text-primary transition-colors">
+                                        {/* <button onClick={() => handleReport(comment._id)} className="flex items-center gap-1 hover:text-primary transition-colors">
                                             <Flag size={14} />
                                             Report
-                                        </button>
+                                        </button> */}
                                     </div>
                                 </div>
                             </div>

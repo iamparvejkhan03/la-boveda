@@ -108,34 +108,34 @@ const AdminCommunications = () => {
                                                 <tr key={comm._id} className="hover:bg-gray-50 transition">
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="text-sm font-medium text-gray-900">{comm.auction?.title || "N/A"}</div>
-                                                        <div className="text-xs text-gray-500">{comm.auction?.category || ""}</div>
+                                                        <div className="text-xs text-gray-500">{comm?.auction?.category || ""}</div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="flex items-center">
                                                             <User size={14} className="text-gray-400 mr-1" />
-                                                            <span className="text-sm">{comm.seller?.username || "Unknown"}</span>
+                                                            <span className="text-sm">{comm?.seller?.username || "Unknown"}</span>
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="flex items-center">
                                                             <User size={14} className="text-gray-400 mr-1" />
-                                                            <span className="text-sm">{comm.winningBidder?.username || "Unknown"}</span>
+                                                            <span className="text-sm">{comm?.winningBidder?.username || "Unknown"}</span>
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <span className="text-sm font-semibold text-gray-900">
-                                                            ${comm.auction?.finalPrice?.toLocaleString() || "0"}
+                                                            ${comm?.auction?.finalPrice?.toLocaleString() || "0"}
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                         <div className="flex items-center">
                                                             <Calendar size={14} className="mr-1" />
-                                                            {format(new Date(comm.lastMessageAt), "MMM d, h:mm a")}
+                                                            {format(new Date(comm?.lastMessageAt), "MMM d, h:mm a")}
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <Link
-                                                            to={`/admin/communication/${comm.auction._id}`}
+                                                            to={`/admin/communication/${comm?.auction?._id}`}
                                                             className="inline-flex items-center px-3 py-1 bg-[#C59D55] text-white rounded-lg hover:bg-[#C59D55]/90 transition"
                                                         >
                                                             <Eye size={16} className="mr-1" />

@@ -299,6 +299,12 @@ function SoldAuctions() {
                                                     <div className="font-medium text-green-600">{formatCurrency(selectedAuction.winningBid)}</div>
                                                 </div>
                                             </div>
+                                            {selectedAuction?.paymentStatus && <div className="flex flex-wrap gap-4 mt-3">
+                                                <div>
+                                                    <div className="text-sm text-gray-500">Payment Status</div>
+                                                    <div className="font-bold text-green-600">{selectedAuction?.paymentStatus}</div>
+                                                </div>
+                                            </div>}
                                         </div>
                                         <Link
                                             to={`/seller/communication/${selectedAuction.id}`}

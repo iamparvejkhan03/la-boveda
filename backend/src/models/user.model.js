@@ -68,11 +68,11 @@ const userSchema = new Schema(
       trim: true,
     },
     address: {
-      dealershipName: { type: String, trim: true },
       buildingNameNo: { type: String, trim: true },
       street: { type: String, trim: true },
       city: { type: String, trim: true },
       county: { type: String, trim: true },
+      state: { type: String, trim: true },
       postCode: { type: String, trim: true },
       country: { type: String, trim: true },
     },

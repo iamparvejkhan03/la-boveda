@@ -409,7 +409,6 @@ function Contact() {
                                         {[
                                             "bidder",
                                             "seller",
-                                            "broker",
                                         ].map((type) => {
                                             const active =
                                                 userType ===

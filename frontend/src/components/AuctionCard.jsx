@@ -89,7 +89,7 @@ function AuctionCard({ auction }) {
                 label: "Reserve",
                 icon: Shield,
                 color:
-                    "bg-[#C59D55]/10 text-[#C59D55] border-[#C59D55]/20",
+                    "bg-orange-100 text-orange-500 border-orange-300",
             });
         }
 
@@ -372,8 +372,10 @@ function AuctionCard({ auction }) {
                             <div className="text-[10px] font-medium uppercase tracking-wider text-gray-400">
                                 {auction.status ===
                                     "sold"
-                                    ? "Final Price"
-                                    : "Starting Price"}
+                                    ? "Final Bid"
+                                    : (auction?.status === 'active' && auction?.bidCount > 0)
+                                    ? 'Current Bid'
+                                    : "Starting Bid"}
                             </div>
 
                             <div className="mt-1 text-lg font-black tracking-tight text-gray-900">

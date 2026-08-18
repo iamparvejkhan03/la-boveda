@@ -148,7 +148,7 @@ const faqs = [
 function FAQsPage() {
     const [openIndex, setOpenIndex] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
-    const [activeCategory, setActiveCategory] = useState("Bidder");
+    const [activeCategory, setActiveCategory] = useState("Buyer");
 
     const activeFaqCategory = faqs.find(
         (category) => category.category === activeCategory

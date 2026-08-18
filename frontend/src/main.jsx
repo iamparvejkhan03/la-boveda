@@ -162,14 +162,14 @@ createRoot(document.getElementById('root')).render(
                             }
                         />
                         {/* Seller All Offers */}
-                        <Route
+                        {/* <Route
                             path='/seller/offers/all'
                             element={
                                 <Suspense fallback={<LoadingSpinner height={'750px'} />}>
                                     <SellerAllOffers />
                                 </Suspense>
                             }
-                        />
+                        /> */}
                         {/* Seller Won Auctions */}
                         <Route
                             path='/seller/auctions/sold'
@@ -286,14 +286,14 @@ createRoot(document.getElementById('root')).render(
                             }
                         />
                         {/* Broker All Offers */}
-                        <Route
+                        {/* <Route
                             path='/broker/offers/all'
                             element={
                                 <Suspense fallback={<LoadingSpinner height={'750px'} />}>
                                     <BrokerAllOffers />
                                 </Suspense>
                             }
-                        />
+                        /> */}
                         {/* Broker Won Auctions */}
                         <Route
                             path='/broker/auctions/sold'
@@ -386,14 +386,14 @@ createRoot(document.getElementById('root')).render(
                         />
 
                         {/* Bidder My Offers */}
-                        <Route
+                        {/* <Route
                             path='/bidder/offers'
                             element={
                                 <Suspense fallback={<LoadingSpinner height={'750px'} />}>
                                     <MyOffers />
                                 </Suspense>
                             }
-                        />
+                        /> */}
 
                         {/* Bidder My Bids */}
                         <Route
@@ -577,14 +577,14 @@ createRoot(document.getElementById('root')).render(
                         />
 
                         {/* Admin Offers */}
-                        <Route
+                        {/* <Route
                             path='/admin/offers'
                             element={
                                 <Suspense fallback={<LoadingSpinner height={'750px'} />}>
                                     <AdminAllOffers />
                                 </Suspense>
                             }
-                        />
+                        /> */}
 
                         {/* Admin Communications */}
                         <Route

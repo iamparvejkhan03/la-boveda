@@ -348,7 +348,7 @@ function BidHistory() {
                                     </select>
                                 </div>
 
-                                <div className="flex items-center gap-2">
+                                {/* <div className="flex items-center gap-2">
                                     <Calendar size={18} className="text-gray-500" />
                                     <input
                                         type="date"
@@ -365,7 +365,7 @@ function BidHistory() {
                                         onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
                                         placeholder="End date"
                                     />
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     </div>

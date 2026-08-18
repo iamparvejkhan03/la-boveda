@@ -102,7 +102,7 @@ function Profile() {
                 formData.append('street', userData.address.street || '');
                 formData.append('city', userData.address.city || '');
                 formData.append('state', userData.address.state || '');
-                formData.append('zipCode', userData.address.zipCode || '');
+                formData.append('postCode', userData.address.postCode || '');
                 formData.append('country', userData.address.country || '');
             }
 
@@ -431,15 +431,6 @@ function Profile() {
                                                     </div>
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <label className="block text-sm font-medium text-secondary">Dealership Name</label>
-                                                    <input
-                                                        type="text"
-                                                        value={userData?.address?.dealershipName || ''}
-                                                        disabled
-                                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-100"
-                                                    />
-                                                </div>
-                                                <div className="space-y-1">
                                                     <label className="block text-sm font-medium text-secondary">Member Since</label>
                                                     <input
                                                         type="text"
@@ -535,7 +526,7 @@ function Profile() {
                                             <p className="font-semibold text-lg">{stats.totalBids?.toLocaleString('en-US') || 0}</p>
                                         </div>
                                     </div> */}
-                                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex items-center">
+                                    {/* <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex items-center">
                                         <div className="p-3 rounded-lg mr-4 bg-blue-100">
                                             <Hand size={20} className="text-blue-600" />
                                         </div>
@@ -543,7 +534,7 @@ function Profile() {
                                             <p className="text-sm text-gray-500">Total Offers</p>
                                             <p className="font-semibold text-lg">{stats.totalOffers?.toLocaleString('en-US') || 0}</p>
                                         </div>
-                                    </div>
+                                    </div> */}
                                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex items-center">
                                         <div className="p-3 rounded-lg mr-4 bg-green-100">
                                             <Award size={20} className="text-green-600" />
@@ -572,7 +563,7 @@ function Profile() {
                                             <p className="font-semibold text-lg">{stats.activeBids?.toLocaleString('en-US') || 0}</p>
                                         </div>
                                     </div> */}
-                                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex items-center">
+                                    {/* <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex items-center">
                                         <div className="p-3 rounded-lg mr-4 bg-purple-100">
                                             <Clock size={20} className="text-purple-600" />
                                         </div>
@@ -580,7 +571,7 @@ function Profile() {
                                             <p className="text-sm text-gray-500">Active Offers</p>
                                             <p className="font-semibold text-lg">{stats.activeOffers?.toLocaleString('en-US') || 0}</p>
                                         </div>
-                                    </div>
+                                    </div> */}
                                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex items-center">
                                         <div className="p-3 rounded-lg mr-4 bg-red-100">
                                             <Heart size={20} className="text-red-600" />

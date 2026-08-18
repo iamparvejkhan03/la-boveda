@@ -826,7 +826,6 @@ const CreateAuction = () => {
                                 {step === 1 && (
                                     <div>
                                         <h2 className="text-xl font-semibold mb-6 flex items-center">
-                                            <Car size={20} className="mr-2" />
                                             Item Details
                                         </h2>
 
@@ -1025,7 +1024,6 @@ const CreateAuction = () => {
                                                 <label htmlFor="photo-upload" className="cursor-pointer">
                                                     <Image size={40} className="mx-auto text-gray-400 mb-2" />
                                                     <p className="text-gray-600">Browse photo(s) to upload</p>
-                                                    <p className="text-sm text-secondary">Recommended: exterior, interior, engine, undercarriage</p>
                                                 </label>
                                             </div>
                                             {errors.photos && <p className="text-red-500 text-sm mt-1">{errors.photos.message}</p>}
@@ -1257,7 +1255,7 @@ const CreateAuction = () => {
                                                 )}
 
                                                 {/* Allow Offers Toggle */}
-                                                <div className="mb-6">
+                                                {/* <div className="mb-6">
                                                     <label className="flex items-center cursor-pointer">
                                                         <div className="relative">
                                                             <input
@@ -1276,7 +1274,7 @@ const CreateAuction = () => {
                                                             </p>
                                                         </div>
                                                     </label>
-                                                </div>
+                                                </div> */}
                                             </>
                                         )}
 
@@ -1383,12 +1381,12 @@ const CreateAuction = () => {
                                                                     {watch('auctionType') === 'giveaway' && 'Free Giveaway'}
                                                                 </p>
                                                             </div>
-                                                            {watch('allowOffers') && (
+                                                            {/* {watch('allowOffers') && (
                                                                 <div>
                                                                     <p className="text-xs text-secondary">Allow Offers</p>
                                                                     <p className="font-medium text-green-600">Yes</p>
                                                                 </div>
-                                                            )}
+                                                            )} */}
                                                             <div>
                                                                 <p className="text-xs text-secondary">Start Date</p>
                                                                 <p className="font-medium">

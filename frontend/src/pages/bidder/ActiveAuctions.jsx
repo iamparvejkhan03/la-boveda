@@ -235,7 +235,7 @@ function ActiveAuctions() {
                                 Active This Week
                             </button>
                             {/* View Mode Toggle */}
-                            <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg">
+                            {/* <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg">
                                 <button
                                     onClick={() => setViewMode("grid")}
                                     className={`p-2 rounded transition-colors ${viewMode === "grid" ? "bg-white shadow-sm" : "hover:bg-gray-200"}`}
@@ -250,7 +250,7 @@ function ActiveAuctions() {
                                 >
                                     <List size={18} className={viewMode === "list" ? "text-blue-600" : "text-gray-500"} />
                                 </button>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
 

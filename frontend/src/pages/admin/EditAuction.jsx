@@ -1840,7 +1840,7 @@ const EditAuction = () => {
                                                 )}
 
                                                 {/* Allow Offers Toggle */}
-                                                <div className="mb-6">
+                                                {/* <div className="mb-6">
                                                     <label className="flex items-center cursor-pointer">
                                                         <div className="relative">
                                                             <input
@@ -1859,7 +1859,7 @@ const EditAuction = () => {
                                                             </p>
                                                         </div>
                                                     </label>
-                                                </div>
+                                                </div> */}
                                             </>
                                         )}
 
@@ -1929,12 +1929,12 @@ const EditAuction = () => {
                                                                     {watch('auctionType') === 'giveaway' && 'Free Giveaway'}
                                                                 </p>
                                                             </div>
-                                                            {watch('allowOffers') && (
+                                                            {/* {watch('allowOffers') && (
                                                                 <div>
                                                                     <p className="text-xs text-secondary">Allow Offers</p>
                                                                     <p className="font-medium text-green-600">Yes</p>
                                                                 </div>
-                                                            )}
+                                                            )} */}
                                                             <div>
                                                                 <p className="text-xs text-secondary">Start Date</p>
                                                                 <p className="font-medium">

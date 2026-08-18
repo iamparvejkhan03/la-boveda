@@ -321,7 +321,7 @@ const FiltersSection = ({
                     </div>
 
                     {/* Allow Offers */}
-                    <div className="mb-4">
+                    {/* <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Accepts Offers
                         </label>
@@ -335,7 +335,7 @@ const FiltersSection = ({
                             <option value="true">Yes</option>
                             <option value="false">No</option>
                         </select>
-                    </div>
+                    </div> */}
                 </div>
             </div>
 

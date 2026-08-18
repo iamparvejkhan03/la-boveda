@@ -53,11 +53,11 @@ const navigation = [
         path: '/admin/bids',
         icon: <Hand size={20} />
     },
-    {
-        name: 'Offers',
-        path: '/admin/offers',
-        icon: <Hand size={20} />
-    },
+    // {
+    //     name: 'Offers',
+    //     path: '/admin/offers',
+    //     icon: <Hand size={20} />
+    // },
     {
         name: 'Communications',
         path: '/admin/communications/all',

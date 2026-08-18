@@ -50,13 +50,13 @@ function Dashboard() {
         //     icon: <Hand size={24} />,
         //     trend: "up"
         // },
-        {
-            title: "Active Offers",
-            value: stats?.activeOffers?.toLocaleString('en-US'),
-            change: "On Live Auctions",
-            icon: <Hand size={24} />,
-            trend: "up"
-        },
+        // {
+        //     title: "Active Offers",
+        //     value: stats?.activeOffers?.toLocaleString('en-US'),
+        //     change: "On Live Auctions",
+        //     icon: <Hand size={24} />,
+        //     trend: "up"
+        // },
         {
             title: "Total Auctions",
             value: stats?.totalParticipatedAuctions?.toLocaleString('en-US'),
@@ -150,10 +150,10 @@ function Dashboard() {
                                         <Bookmark size={24} className="mx-auto mb-2 text-[#1e2d3b] hover:text-[#edcd1f]" />
                                         <p className="text-sm font-medium">View Watchlist</p>
                                     </Link>
-                                    <Link to="/bidder/offers" className="bg-white border border-gray-200 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
+                                    {/* <Link to="/bidder/offers" className="bg-white border border-gray-200 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
                                         <TrendingUp size={24} className="mx-auto mb-2 text-[#1e2d3b] hover:text-[#edcd1f]" />
                                         <p className="text-sm font-medium">My Offers</p>
-                                    </Link>
+                                    </Link> */}
                                     <Link to="/bidder/auctions/won" className="bg-white border border-gray-200 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
                                         <Award size={24} className="mx-auto mb-2 text-[#1e2d3b] hover:text-[#edcd1f]" />
                                         <p className="text-sm font-medium">Won Auctions</p>

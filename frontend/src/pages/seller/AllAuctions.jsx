@@ -468,7 +468,7 @@ function AllAuctions() {
                                                                         >
                                                                             View
                                                                         </Link>
-                                                                        <button
+                                                                        {/* <button
                                                                             onClick={() => {
                                                                                 handleShowReserveModal(auction);
                                                                                 setActiveDropdown(null);
@@ -476,7 +476,7 @@ function AllAuctions() {
                                                                             className="px-4 py-2 text-orange-600 hover:bg-orange-50 transition-colors text-left"
                                                                         >
                                                                             Lower Reserve Price
-                                                                        </button>
+                                                                        </button> */}
                                                                         <Link
                                                                             to={`/seller/auctions/edit/${auction._id}`}
                                                                             className="px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors text-left"

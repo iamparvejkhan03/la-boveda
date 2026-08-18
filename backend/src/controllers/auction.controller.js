@@ -2125,6 +2125,7 @@ export const getSoldAuctions = async (req, res) => {
         title: auction.title,
         description: auction.description,
         category: auction.category,
+        paymentStatus: auction?.paymentStatus,
         auctionType:
           auction.auctionType === "reserve"
             ? "Reserve Auction"

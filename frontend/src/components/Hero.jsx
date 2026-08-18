@@ -19,6 +19,7 @@ import {
 import { Container } from "../components";
 import { heroImg } from "../assets";
 import axiosInstance from "../utils/axiosInstance";
+import { extractYouTubeId } from "./YouTubeEmbed";
 
 function Hero() {
     const navigate = useNavigate();

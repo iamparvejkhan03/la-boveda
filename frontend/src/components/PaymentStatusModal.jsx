@@ -108,7 +108,7 @@ const PaymentStatusModal = ({ isOpen, onClose, auction, onSubmit, loading }) => 
                     {/* New Payment Status */}
                     <div className="mb-6">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            New Payment Status *
+                            New Payment Status <span className='text-xs font-semibold'>(mark payment as:)</span> *
                         </label>
                         <div className="grid grid-cols-2 md:grid-cols-2 gap-2">
                             {['pending', 'processing', 'completed', 'failed'].map((status) => (

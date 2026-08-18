@@ -101,41 +101,41 @@ function Dashboard() {
             trend: "down",
             description: "Needs Approval"
         },
-        {
-            title: "Total Offers",
-            value: adminStats?.totalOffers?.toLocaleString('en-US'),
-            change: `Today: ${adminStats?.totalOffers?.toLocaleString('en-US') || 0}`,
-            icon: <Hand size={24} />,
-            trend: "up",
-            description: "All-time offers received"
-        },
-        {
-            title: "Total Offer Value",
-            value: adminStats?.totalOfferValue?.toLocaleString('en-US'),
-            change: `Today: ${adminStats?.totalOfferValue?.toLocaleString('en-US') || 0}`,
-            icon: <Hand size={24} />,
-            trend: "up",
-            currency: "$",
-            description: "Total value of all offers"
-        },
-        {
-            title: "Highest Offer",
-            value: adminStats?.highestOfferAmount?.toLocaleString('en-US'),
-            change: `Today: ${adminStats?.highestOfferAmount?.toLocaleString('en-US') || 0}`,
-            icon: <Hand size={24} />,
-            trend: "up",
-            currency: "$",
-            description: "All-time highest offer"
-        },
-        {
-            title: "Average Offer",
-            value: adminStats?.averageOfferAmount?.toFixed(0)?.toLocaleString('en-US'),
-            change: `Today: ${adminStats?.averageOfferAmount?.toLocaleString('en-US') || 0}$`,
-            icon: <Hand size={24} />,
-            trend: "up",
-            currency: "$",
-            description: "Average offer amount"
-        },
+        // {
+        //     title: "Total Offers",
+        //     value: adminStats?.totalOffers?.toLocaleString('en-US'),
+        //     change: `Today: ${adminStats?.totalOffers?.toLocaleString('en-US') || 0}`,
+        //     icon: <Hand size={24} />,
+        //     trend: "up",
+        //     description: "All-time offers received"
+        // },
+        // {
+        //     title: "Total Offer Value",
+        //     value: adminStats?.totalOfferValue?.toLocaleString('en-US'),
+        //     change: `Today: ${adminStats?.totalOfferValue?.toLocaleString('en-US') || 0}`,
+        //     icon: <Hand size={24} />,
+        //     trend: "up",
+        //     currency: "$",
+        //     description: "Total value of all offers"
+        // },
+        // {
+        //     title: "Highest Offer",
+        //     value: adminStats?.highestOfferAmount?.toLocaleString('en-US'),
+        //     change: `Today: ${adminStats?.highestOfferAmount?.toLocaleString('en-US') || 0}`,
+        //     icon: <Hand size={24} />,
+        //     trend: "up",
+        //     currency: "$",
+        //     description: "All-time highest offer"
+        // },
+        // {
+        //     title: "Average Offer",
+        //     value: adminStats?.averageOfferAmount?.toFixed(0)?.toLocaleString('en-US'),
+        //     change: `Today: ${adminStats?.averageOfferAmount?.toLocaleString('en-US') || 0}$`,
+        //     icon: <Hand size={24} />,
+        //     trend: "up",
+        //     currency: "$",
+        //     description: "Average offer amount"
+        // },
         {
             title: "Total Sales",
             value: adminStats.totalRevenue?.toLocaleString('en-US'),
@@ -206,14 +206,14 @@ function Dashboard() {
             currency: "$",
             description: `On ${adminStats?.totalAuctions} Auctions`
         },
-        {
-            title: "Pending Offers",
-            value: adminStats?.pendingOffers?.toLocaleString('en-US'),
-            change: `Today: ${adminStats?.pendingOffers?.toLocaleString('en-US') || 0}$`,
-            icon: <Hand size={24} />,
-            trend: "down",
-            description: "Offers awaiting review"
-        },
+        // {
+        //     title: "Pending Offers",
+        //     value: adminStats?.pendingOffers?.toLocaleString('en-US'),
+        //     change: `Today: ${adminStats?.pendingOffers?.toLocaleString('en-US') || 0}$`,
+        //     icon: <Hand size={24} />,
+        //     trend: "down",
+        //     description: "Offers awaiting review"
+        // },
         {
             title: "Total Comments",
             value: adminStats?.totalComments?.toLocaleString('en-US'),
@@ -320,7 +320,7 @@ function Dashboard() {
                                 {/* Quick Actions */}
                                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                                     <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                         <Link to="/admin/users" className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center hover:bg-blue-100 transition-colors group">
                                             <Users size={24} className="mx-auto mb-2 text-blue-600 group-hover:scale-110 transition-transform" />
                                             <p className="text-sm font-medium text-blue-800">User Management</p>
@@ -329,10 +329,10 @@ function Dashboard() {
                                             <Gavel size={24} className="mx-auto mb-2 text-green-600 group-hover:scale-110 transition-transform" />
                                             <p className="text-sm font-medium text-green-800">Auction Oversight</p>
                                         </Link>
-                                        <Link to="/admin/offers" className="bg-purple-50 border border-purple-200 rounded-lg p-4 text-center hover:bg-purple-100 transition-colors group">
+                                        {/* <Link to="/admin/offers" className="bg-purple-50 border border-purple-200 rounded-lg p-4 text-center hover:bg-purple-100 transition-colors group">
                                             <Hand size={24} className="mx-auto mb-2 text-purple-600 group-hover:scale-110 transition-transform" />
                                             <p className="text-sm font-medium text-purple-800">Offers</p>
-                                        </Link>
+                                        </Link> */}
                                         <Link to="/admin/comments" className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center hover:bg-gray-100 transition-colors group">
                                             <MessageCircle size={24} className="mx-auto mb-2 text-gray-600 group-hover:scale-110 transition-transform" />
                                             <p className="text-sm font-medium text-gray-800">Comments</p>

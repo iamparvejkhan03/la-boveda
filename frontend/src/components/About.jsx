@@ -51,7 +51,7 @@ function About() {
     return (
         <section
             ref={ref}
-            className="relative overflow-hidden bg-white py-14"
+            className="relative overflow-hidden py-14"
         >
             {/* BACKGROUND DETAILS */}
             <div className="pointer-events-none absolute -right-40 top-20 h-[500px] w-[500px] rounded-full bg-[#C59D55]/[0.045] blur-[100px]" />

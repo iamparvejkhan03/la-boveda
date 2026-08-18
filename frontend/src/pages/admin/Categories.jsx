@@ -598,7 +598,7 @@ function Categories() {
                             </div>
 
                             {/* Level Filter */}
-                            <div>
+                            {/* <div>
                                 <select
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C59D55] focus:border-transparent"
                                     value={filters.level}
@@ -608,10 +608,10 @@ function Categories() {
                                     <option value="0">Parent Categories</option>
                                     <option value="1">Subcategories</option>
                                 </select>
-                            </div>
+                            </div> */}
 
                             {/* Status Filter */}
-                            <div>
+                            {/* <div>
                                 <select
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C59D55] focus:border-transparent"
                                     value={filters.status}
@@ -621,10 +621,10 @@ function Categories() {
                                     <option value="true">Active</option>
                                     <option value="false">Inactive</option>
                                 </select>
-                            </div>
+                            </div> */}
 
                             {/* Sort By */}
-                            <div>
+                            {/* <div>
                                 <select
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C59D55] focus:border-transparent"
                                     value={filters.sortBy}
@@ -635,7 +635,7 @@ function Categories() {
                                     <option value="level">Sort by Level</option>
                                     <option value="createdAt">Sort by Date</option>
                                 </select>
-                            </div>
+                            </div> */}
                         </div>
 
                         <div className="flex justify-between items-center mt-4">

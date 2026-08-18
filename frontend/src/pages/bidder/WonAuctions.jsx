@@ -535,7 +535,7 @@ function WonAuctions() {
                                         <div>
                                             {/* <p className="text-sm text-gray-500">Starting Bid</p> */}
                                             <p className="text-sm text-gray-500">Starting Price</p>
-                                            <p className="font-semibold text-blue-600">
+                                            <p className="font-semibold">
                                                 {formatCurrency(auction.startingBid)}
                                             </p>
                                         </div>
@@ -550,10 +550,10 @@ function WonAuctions() {
                                                 </div>
                                             )
                                         }
-                                        <div>
+                                        {/* <div>
                                             <p className="text-sm text-gray-500">Total Offers</p>
                                             <p className="font-semibold">{auction?.offersCount} offers</p>
-                                        </div>
+                                        </div> */}
                                         <div>
                                             <p className="text-sm text-gray-500">Total Bids</p>
                                             <p className="font-semibold">{auction?.bidsCount} bids</p>
@@ -563,16 +563,15 @@ function WonAuctions() {
                                                 <div>
                                                     {/* <p className="text-sm text-gray-500">Your Max Bid</p> */}
                                                     <p className="text-sm text-gray-500">Payment Status</p>
-                                                    <p className="font-semibold capitalize">{auction?.paymentStatus}</p>
+                                                    <p className="font-semibold capitalize text-blue-600">{auction?.paymentStatus === 'completed' ? 'Payment Received By Admin' : auction?.paymentStatus}</p>
                                                 </div>
                                             )
                                         }
                                         {
-                                            auction?.invoice && (
+                                            Object.keys(auction?.invoice)?.length > 0 && (
                                                 <div>
-                                                    {/* <p className="text-sm text-gray-500">Your Max Bid</p> */}
                                                     <p className="text-sm text-gray-500">Invoice</p>
-                                                    <Link target="_blank" to={auction?.invoice?.url} className="font-semibold text-blue-600 underline">
+                                                    <Link target="_blank" to={auction?.invoice?.url} className="font-semibold underline">
                                                         View
                                                     </Link>
                                                 </div>
