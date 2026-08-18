@@ -211,21 +211,21 @@ function Hero() {
                                 </span>
 
                                 {[
-                                    "Rookie Cards",
+                                    "Jerseys & Kits",
                                     "Signed Jerseys",
                                     "Game Balls",
-                                    "Autographed Photos"
+                                    "Autographs"
                                 ].map((item) => (
                                     <button
                                         key={item}
                                         type="button"
-                                        onClick={() =>
-                                            navigate(
-                                                `/auctions?category=${encodeURIComponent(
-                                                    item.toLowerCase()
-                                                )}`
-                                            )
-                                        }
+                                        // onClick={() =>
+                                        //     navigate(
+                                        //         `/auctions?category=${encodeURIComponent(
+                                        //             item.toLowerCase()
+                                        //         )}`
+                                        //     )
+                                        // }
                                         className="rounded-full border border-white/10 bg-white/[0.035] px-3.5 py-1.5 text-xs text-white/55 transition-all hover:border-[#C59D55]/40 hover:bg-[#C59D55]/10 hover:text-[#D8C18E]"
                                     >
                                         {item}
