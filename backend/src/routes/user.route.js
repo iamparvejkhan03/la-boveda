@@ -1,13 +1,16 @@
 import { Router } from "express";
 import upload from "../middlewares/multer.middleware.js";
 import { 
+    deleteIdentification,
     forgotPassword,
     getBillingInfo,
+    getVerificationStatus,
     loginUser, 
     refreshAccessToken, 
     registerUser,
     resetPassword,
     updatePaymentMethod,
+    uploadIdentification,
 } from "../controllers/user.controller.js";
 
 import {
@@ -23,7 +26,7 @@ import { auth } from "../middlewares/auth.middleware.js";
 const userRouter = Router();
 
 // Public routes
-userRouter.post('/register', registerUser);
+userRouter.post('/register', upload.single('identificationDocument'), registerUser);
 userRouter.post('/login', loginUser);
 userRouter.post('/refresh-token', refreshAccessToken);
 userRouter.post('/forgot-password', forgotPassword);
@@ -37,5 +40,14 @@ userRouter.put('/preferences', auth, updatePreferences);
 userRouter.get('/stats/:userType', auth, getUserStats);
 userRouter.get('/billing', auth, getBillingInfo);
 userRouter.put('/billing/update-card', auth, updatePaymentMethod);
+
+// ID Verification routes (Protected)
+userRouter.post('/upload-identification', 
+    auth, 
+    upload.single('identificationDocument'), 
+    uploadIdentification
+);
+userRouter.get('/verification-status', auth, getVerificationStatus);
+userRouter.delete('/identification', auth, deleteIdentification);
 
 export default userRouter;

@@ -184,6 +184,31 @@ const userSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    // ID Verification Fields
+    identificationDocument: {
+      type: String, // Cloudinary URL
+      trim: true,
+    },
+    identificationDocumentPublicId: {
+      type: String, // Cloudinary public ID for deletion
+      trim: true,
+    },
+    identificationStatus: {
+      type: String,
+      enum: ["pending", "verified", "rejected"],
+      default: "verified",
+    },
+    identificationVerifiedAt: {
+      type: Date,
+    },
+    identificationRejectionReason: {
+      type: String,
+      trim: true,
+    },
+    identificationType: {
+      type: String,
+      enum: ["passport", "drivers_license", "national_id", "other"],
+    },
 
     // Tokens
     refreshToken: {

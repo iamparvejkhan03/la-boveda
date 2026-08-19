@@ -12,6 +12,7 @@ import {
 } from "../utils/cloudinary.js";
 
 import {
+  accountApprovedEmail,
   auctionApprovedEmail,
   auctionListedEmail,
   paymentCompletedEmail,
@@ -261,12 +262,12 @@ export const getAdminStats = async (req, res) => {
       averageSalePrice,
       highestSaleAuction: highestSaleAuction
         ? {
-            title: highestSaleAuction.title,
-            amount: highestSaleAuction.finalPrice,
-            seller: highestSaleAuction.seller?.username || "Unknown",
-            winner: highestSaleAuction.winner?.username || "Unknown",
-            date: highestSaleAuction.createdAt,
-          }
+          title: highestSaleAuction.title,
+          amount: highestSaleAuction.finalPrice,
+          seller: highestSaleAuction.seller?.username || "Unknown",
+          winner: highestSaleAuction.winner?.username || "Unknown",
+          date: highestSaleAuction.createdAt,
+        }
         : null,
 
       // Performance metrics
@@ -910,14 +911,18 @@ export const approveAuction = async (req, res) => {
         auction._id,
         auction.startDate,
       );
-      await auctionApprovedEmail(auction.seller, auction);
+      auctionApprovedEmail(auction.seller, auction).catch((error) =>
+        console.error("Failed to send auction approved email:", error),
+      );
     } else {
       // Activate immediately
       auction.status = "active";
 
-      await auction.populate("seller", "email username firstName");
+      await auction.populate("seller", "email username companyName firstName lastName");
 
-      await auctionListedEmail(auction, auction.seller);
+      await auctionListedEmail(auction, auction.seller).catch((error) =>
+        console.error("Failed to send auction listed email:", error),
+      );
 
       // If end date is in past, end the auction
       if (auction.endDate <= now) {
@@ -938,9 +943,11 @@ export const approveAuction = async (req, res) => {
       _id: { $ne: auction?.seller?._id }, // Exclude auction owner
       userType: { $ne: "admin" }, // Exclude admin users
       isActive: true, // Only active users
-    }).select("email username firstName preferences userType");
+    }).select("email username companyName firstName lastName preferences userType currency");
 
-    await sendBulkAuctionNotifications(bidders, auction, auction.seller);
+    sendBulkAuctionNotifications(bidders, auction, auction.seller).catch((error) =>
+      console.error("Failed to send bulk auction notifications email:", error),
+    );
   } catch (error) {
     console.error("Approve auction error:", error);
     res.status(500).json({
@@ -1080,9 +1087,9 @@ export const updateAuction = async (req, res) => {
           // Check if it's a comma-separated string
           categoriesArray = req.body.categories.includes(",")
             ? req.body.categories
-                .split(",")
-                .map((c) => c.trim())
-                .filter(Boolean)
+              .split(",")
+              .map((c) => c.trim())
+              .filter(Boolean)
             : [req.body.categories];
         }
       }
@@ -1972,7 +1979,7 @@ export const updatePaymentStatus = async (req, res) => {
       .populate("seller", "username firstName lastName email phone address")
       .populate("winner", "username firstName lastName email phone address");
 
-    const updatedPayment = await Payment.findOneAndUpdate({auction: updatedAuction?._id}, {status: paymentStatus, processedBy: admin})
+    const updatedPayment = await Payment.findOneAndUpdate({ auction: updatedAuction?._id }, { status: paymentStatus, processedBy: admin })
 
     res.status(200).json({
       success: true,
@@ -2013,86 +2020,6 @@ export const updatePaymentStatus = async (req, res) => {
   }
 };
 
-// export const fetchDVLAData = async (req, res) => {
-//   try {
-//     const { registrationNumber } = req.params;
-
-//     // Make sure registrationNumber exists
-//     if (!registrationNumber) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Registration number is required",
-//       });
-//     }
-
-//     // Call DVLA API with correct structure
-//     const dvlaResponse = await backendAxios.post(
-//       `https://driver-vehicle-licensing.api.gov.uk/vehicle-enquiry/v1/vehicles`,
-//       {
-//         registrationNumber: registrationNumber
-//       },
-//       {
-//         headers: {
-//           "x-api-key": "kkrJPemNwS7mTx65GqRBH4njJd1fyz5h23k8udHD",
-//           "Content-Type": "application/json",
-//           // Optional: Add Accept header for good practice
-//           "Accept": "application/json"
-//         }
-//       }
-//     );
-
-//     // DVLA API typically returns 200 for successful requests
-//     // But let's check for any 2xx status code
-//     if (dvlaResponse.status < 200 || dvlaResponse.status >= 300) {
-//       return res.status(dvlaResponse.status).json({
-//         success: false,
-//         message: "Failed to fetch data from DVLA",
-//         error: dvlaResponse.data
-//       });
-//     }
-
-//     const vehicleData = dvlaResponse.data;
-
-//     console.log("DVLA vehicle data:", vehicleData);
-
-//     res.status(200).json({
-//       success: true,
-//       data: vehicleData,
-//     });
-//   } catch (error) {
-//     console.error("Fetch DVLA data error:", error);
-
-//     // Provide more specific error messages
-//     if (error.response) {
-//       // The request was made and the server responded with a status code
-//       // that falls out of the range of 2xx
-//       console.error("Error response data:", error.response.data);
-//       console.error("Error status:", error.response.status);
-//       console.error("Error headers:", error.response.headers);
-
-//       return res.status(error.response.status).json({
-//         success: false,
-//         message: `DVLA API error: ${error.response.status} - ${error.response.statusText}`,
-//         error: error.response.data
-//       });
-//     } else if (error.request) {
-//       // The request was made but no response was received
-//       console.error("No response received:", error.request);
-//       return res.status(503).json({
-//         success: false,
-//         message: "No response from DVLA API. Please try again later.",
-//       });
-//     } else {
-//       // Something happened in setting up the request that triggered an Error
-//       console.error("Request setup error:", error.message);
-//       return res.status(500).json({
-//         success: false,
-//         message: "Internal server error while fetching DVLA data",
-//       });
-//     }
-//   }
-// };
-
 export const fetchDVLAData = async (req, res) => {
   try {
     const { registrationNumber } = req.body;
@@ -2121,6 +2048,180 @@ export const fetchDVLAData = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to fetch vehicle details",
+    });
+  }
+};
+
+// Verify user identity
+export const verifyUserIdentity = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { notes } = req.body; // Optional admin notes
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (!user.identificationDocument) {
+      return res.status(400).json({
+        success: false,
+        message: "User has not uploaded any identification document",
+      });
+    }
+
+    // Update user verification status
+    user.identificationStatus = "verified";
+    user.identificationVerifiedAt = new Date();
+    user.identificationRejectionReason = null;
+    user.isVerified = true;
+
+    await user.save();
+
+    // Send approval email (fire and forget)
+    accountApprovedEmail(user).catch(err =>
+      console.error("Failed to send account approved email:", err)
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "User identity verified successfully",
+      data: {
+        id: user._id,
+        name: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+        identificationStatus: user.identificationStatus,
+        isVerified: user.isVerified,
+      },
+    });
+  } catch (error) {
+    console.error("Verification error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+// Reject user identity verification
+export const rejectUserIdentity = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { rejectionReason, allowReupload = true } = req.body;
+
+    if (!rejectionReason) {
+      return res.status(400).json({
+        success: false,
+        message: "Rejection reason is required",
+      });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Store old document info for potential cleanup
+    const oldDocumentPublicId = user.identificationDocumentPublicId;
+
+    // Update user verification status
+    user.identificationStatus = "rejected";
+    user.identificationRejectionReason = rejectionReason;
+
+    // If user can reupload, keep the document for reference
+    if (!allowReupload) {
+      // Delete the document from Cloudinary
+      if (oldDocumentPublicId) {
+        try {
+          await deleteFromCloudinary(oldDocumentPublicId, "raw");
+        } catch (cloudinaryError) {
+          console.error("Failed to delete rejected document:", cloudinaryError);
+        }
+      }
+
+      // Clear document fields
+      user.identificationDocument = null;
+      user.identificationDocumentPublicId = null;
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "User identity verification rejected",
+      data: {
+        id: user._id,
+        name: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+        identificationStatus: user.identificationStatus,
+        rejectionReason: user.identificationRejectionReason,
+        canReupload: allowReupload,
+      },
+    });
+  } catch (error) {
+    console.error("Rejection error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+// Verify user
+export const verifyUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { notes } = req.body; // Optional admin notes
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "User is already verified.",
+      });
+    }
+
+    // Update user verification status
+    user.isVerified = true;
+
+    await user.save();
+
+    // Send approval email (fire and forget)
+    accountApprovedEmail(user).catch(err =>
+      console.error("Failed to send account approved email:", err)
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "User verified successfully",
+      data: {
+        id: user._id,
+        name: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+        isVerified: user.isVerified,
+      },
+    });
+  } catch (error) {
+    console.error("Verification error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
     });
   }
 };

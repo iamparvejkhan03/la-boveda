@@ -8,6 +8,7 @@ import {
 } from "../utils/nodemailer.js";
 import crypto from "crypto";
 import BidPayment from "../models/bidPayment.model.js";
+import { deleteFromCloudinary, uploadDocumentToCloudinary, uploadImageToCloudinary } from "../utils/cloudinary.js";
 
 // Helper function to generate tokens and set cookies
 const generateTokensAndRespond = async (user, req, res, message) => {
@@ -93,6 +94,26 @@ export const registerUser = async (req, res) => {
       });
     }
 
+    // Handle ID document upload
+    const identificationDocumentFile = req.file;
+    let identificationDocumentUrl = null;
+    let identificationDocumentPublicId = null;
+
+    if (identificationDocumentFile) {
+      const isImage = identificationDocumentFile.mimetype.startsWith('image/');
+      const uploadFn = isImage
+        ? uploadImageToCloudinary
+        : uploadDocumentToCloudinary;
+
+      const uploadResult = await uploadFn(
+        identificationDocumentFile.buffer,
+        isImage ? undefined : identificationDocumentFile.originalname,
+        'identification-documents'
+      );
+      identificationDocumentUrl = uploadResult.secure_url;
+      identificationDocumentPublicId = uploadResult.public_id;
+    }
+
     // Create user in database
     const userData = {
       firstName,
@@ -105,7 +126,10 @@ export const registerUser = async (req, res) => {
       countryName,
       phone,
       image,
-      isVerified: true,
+      isVerified: false,
+      identificationDocument: identificationDocumentUrl,
+      identificationDocumentPublicId,
+      identificationStatus: identificationDocumentUrl ? 'pending' : undefined,
       // Add address object
       address: {
         dealershipName,
@@ -406,83 +430,6 @@ export const getBillingInfo = async (req, res) => {
   }
 };
 
-// export const updatePaymentMethod = async (req, res) => {
-//     try {
-//         const { paymentMethodId } = req.body;
-//         const userId = req.user._id;
-
-//         if (!paymentMethodId) {
-//             return res.status(400).json({
-//                 success: false,
-//                 message: 'Payment method ID is required'
-//             });
-//         }
-
-//         const user = await User.findById(userId);
-
-//         if (!user) {
-//             return res.status(404).json({
-//                 success: false,
-//                 message: 'User not found'
-//             });
-//         }
-
-//         if (!user.stripeCustomerId) {
-//             return res.status(400).json({
-//                 success: false,
-//                 message: 'No Stripe customer found'
-//             });
-//         }
-
-//         // Verify and update card with Stripe (using the same function from registration)
-//         const verificationResult = await StripeService.verifyAndSaveCard(
-//             user.stripeCustomerId,
-//             paymentMethodId
-//         );
-
-//         if (!verificationResult.success) {
-//             throw new Error('Card verification failed');
-//         }
-
-//         const paymentMethodDetails = verificationResult.paymentMethod;
-
-//         // Update user in database
-//         user.paymentMethodId = paymentMethodDetails.id;
-//         user.cardLast4 = paymentMethodDetails.last4;
-//         user.cardBrand = paymentMethodDetails.brand;
-//         user.cardExpMonth = paymentMethodDetails.expMonth;
-//         user.cardExpYear = paymentMethodDetails.expYear;
-//         user.isPaymentVerified = true;
-
-//         await user.save();
-
-//         const updatedCardInfo = {
-//             last4: user.cardLast4,
-//             brand: user.cardBrand,
-//             expMonth: user.cardExpMonth,
-//             expYear: user.cardExpYear
-//         };
-
-//         res.status(200).json({
-//             success: true,
-//             message: 'Payment method updated successfully',
-//             data: {
-//                 card: updatedCardInfo,
-//                 isPaymentVerified: true,
-//                 userType: user.userType,
-//                 stripeCustomerId: user.stripeCustomerId
-//             }
-//         });
-
-//     } catch (error) {
-//         console.error('Update payment method error:', error);
-//         res.status(400).json({
-//             success: false,
-//             message: error.message || 'Failed to update payment method'
-//         });
-//     }
-// };
-
 export const updatePaymentMethod = async (req, res) => {
   try {
     const { paymentMethodId } = req.body;
@@ -602,6 +549,191 @@ export const updatePaymentMethod = async (req, res) => {
     res.status(400).json({
       success: false,
       message: error.message || "Failed to update payment method",
+    });
+  }
+};
+
+// Upload identification document
+export const uploadIdentification = async (req, res) => {
+  try {
+    const userId = req.user.id; // From auth middleware
+    const file = req.file;
+
+    if (!file) {
+      return res.status(400).json({
+        success: false,
+        message: "No file uploaded",
+      });
+    }
+
+    // Validate file type
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "application/pdf",
+    ];
+    if (!allowedTypes.includes(file.mimetype)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid file type. Only JPG, PNG, and PDF are allowed",
+      });
+    }
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Check if user can upload (only if rejected or not verified)
+    if (user.identificationStatus === "verified") {
+      return res.status(400).json({
+        success: false,
+        message: "Your identity is already verified",
+      });
+    }
+
+    // If user had previous document, delete it from Cloudinary
+    if (user.identificationDocumentPublicId) {
+      try {
+        await deleteFromCloudinary(user.identificationDocumentPublicId, "raw");
+      } catch (deleteError) {
+        console.error("Failed to delete old document:", deleteError);
+        // Continue with upload even if delete fails
+      }
+    }
+
+    // Upload new document to Cloudinary
+    const isImage = file.mimetype.startsWith("image/");
+    let uploadResult;
+
+    if (isImage) {
+      uploadResult = await uploadImageToCloudinary(
+        file.buffer,
+        "identification-documents",
+      );
+    } else {
+      uploadResult = await uploadDocumentToCloudinary(
+        file.buffer,
+        file.originalname,
+        "identification-documents",
+      );
+    }
+
+    // Update user with new document info
+    user.identificationDocument = uploadResult.secure_url;
+    user.identificationDocumentPublicId = uploadResult.public_id;
+    user.identificationStatus = "pending";
+    user.identificationRejectionReason = null; // Clear any previous rejection reason
+    user.identificationVerifiedAt = null;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Identification document uploaded successfully",
+      data: {
+        user: user.toSafeObject(),
+      },
+    });
+  } catch (error) {
+    console.error("Upload identification error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to upload identification document",
+    });
+  }
+};
+
+// Get user's verification status
+export const getVerificationStatus = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await User.findById(userId).select(
+      "identificationDocument identificationStatus identificationVerifiedAt identificationRejectionReason",
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        status: user.identificationStatus || "not_uploaded",
+        documentUrl: user.identificationDocument,
+        verifiedAt: user.identificationVerifiedAt,
+        rejectionReason: user.identificationRejectionReason,
+      },
+    });
+  } catch (error) {
+    console.error("Get verification status error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch verification status",
+    });
+  }
+};
+
+// Delete identification document
+export const deleteIdentification = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Only allow deletion if status is rejected or pending
+    if (user.identificationStatus === "verified") {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot delete verified document",
+      });
+    }
+
+    // Delete from Cloudinary
+    if (user.identificationDocumentPublicId) {
+      try {
+        await deleteFromCloudinary(user.identificationDocumentPublicId, "raw");
+      } catch (deleteError) {
+        console.error("Failed to delete from Cloudinary:", deleteError);
+      }
+    }
+
+    // Clear document fields
+    user.identificationDocument = null;
+    user.identificationDocumentPublicId = null;
+    user.identificationStatus = null;
+    user.identificationRejectionReason = null;
+    user.identificationVerifiedAt = null;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Identification document deleted successfully",
+      data: {
+        user: user.toSafeObject(),
+      },
+    });
+  } catch (error) {
+    console.error("Delete identification error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete identification document",
     });
   }
 };

@@ -14,7 +14,10 @@ import {
     deleteAuction,
     updateAuction,
     updatePaymentStatus,
-    fetchDVLAData
+    fetchDVLAData,
+    verifyUserIdentity,
+    verifyUser,
+    rejectUserIdentity
 } from '../controllers/admin.controller.js';
 import { authAdmin } from '../middlewares/auth.middleware.js';
 import upload from '../middlewares/multer.middleware.js';
@@ -28,6 +31,9 @@ AdminRouter.get('/users/:userId', authAdmin, getUserDetails);
 AdminRouter.patch('/users/:userId/status', authAdmin, updateUserStatus);
 AdminRouter.patch('/users/:userId/type', authAdmin, updateUserType);
 AdminRouter.delete('/users/:userId', authAdmin, deleteUser);
+AdminRouter.patch('/users/:userId/identificationDocument/verify', authAdmin, verifyUserIdentity);
+AdminRouter.patch('/users/:userId/verify', authAdmin, verifyUser);
+AdminRouter.patch('/users/:userId/identificationDocument/reject', authAdmin, rejectUserIdentity);
 
 //dvla api route
 AdminRouter.post('/dvla', authAdmin, fetchDVLAData);
