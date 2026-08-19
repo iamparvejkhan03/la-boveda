@@ -17,6 +17,11 @@ function Protected({ authetication, children, userType }) {
             navigate('profile')
         }
 
+        else if(!loading && authetication && userType === 'admin' && user?.userType !== 'admin'){
+            navigate(`/${user.userType}/dashboard`);
+            toast.error(`You are not allowed to access ${userType}'s path`);
+        }
+
         // else if(!loading && authetication && userType !== user.userType){
         //     navigate(`/${user.userType}/dashboard`);
         //     toast.error(`You are not allowed to access ${userType}'s path`);

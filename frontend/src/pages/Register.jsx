@@ -523,7 +523,7 @@ const Register = () => {
                         </div>
 
                         {/* User Type Selection */}
-                        <div className={`border-t pt-6 ${errors.email && 'mb-3'}`}>
+                        {/* <div className={`border-t pt-6 ${errors.email && 'mb-3'}`}>
                             <label className="text-sm font-medium leading-none text-gray-700 flex items-center gap-2 mb-4">
                                 <User size={20} />
                                 <span>User Type</span>
@@ -571,7 +571,7 @@ const Register = () => {
                             {errors.userType && (
                                 <p className="text-red-500 text-sm mt-1 absolute">{errors.userType.message}</p>
                             )}
-                        </div>
+                        </div> */}
 
                         {/* ID Verification Section */}
                             <div id="id-verification-section" className="border-t border-gray-200 dark:border-bg-primary-light pt-6">
