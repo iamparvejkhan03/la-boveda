@@ -1552,13 +1552,21 @@ export const placeBid = async (req, res) => {
       });
     }
 
-    // Check if user is a bidder
-    if (bidder.userType !== "bidder") {
-      return res.status(403).json({
+    // Validate auction status
+    if (!bidder?.isVerified) {
+      return res.status(400).json({
         success: false,
-        message: "Only bidders can place bids",
+        message: `Account is not verified. Can't place a bid.`,
       });
     }
+
+    // Check if user is a bidder
+    // if (bidder.userType !== "bidder") {
+    //   return res.status(403).json({
+    //     success: false,
+    //     message: "Only bidders can place bids",
+    //   });
+    // }
 
     const auction = await Auction.findById(id);
 
@@ -2324,13 +2332,21 @@ export const buyNow = async (req, res) => {
       });
     }
 
-    // Check if user is a bidder
-    if (buyer?.userType !== "bidder") {
-      return res.status(403).json({
+    // Validate auction status
+    if (!buyer?.isVerified) {
+      return res.status(400).json({
         success: false,
-        message: "Only bidders can buy items",
+        message: `Account is not verified. Can't buy an item.`,
       });
     }
+
+    // Check if user is a bidder
+    // if (buyer?.userType !== "bidder") {
+    //   return res.status(403).json({
+    //     success: false,
+    //     message: "Only bidders can buy items",
+    //   });
+    // }
 
     // Find auction
     const auction = await Auction.findById(id)

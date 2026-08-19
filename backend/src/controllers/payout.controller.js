@@ -29,12 +29,12 @@ export const getPayoutMethods = async (req, res) => {
         }
 
         // Check if user is seller
-        if (user.userType !== "seller" && user.userType !== "broker" && user.userType !== "admin") {
-            return res.status(403).json({
-                success: false,
-                message: "Only sellers, admin, and brokers can access payout methods",
-            });
-        }
+        // if (user.userType !== "seller" && user.userType !== "broker" && user.userType !== "admin") {
+        //     return res.status(403).json({
+        //         success: false,
+        //         message: "Only sellers, admin, and brokers can access payout methods",
+        //     });
+        // }
 
         res.status(200).json({
             success: true,

@@ -228,9 +228,9 @@ export const getBidderPayments = async (req, res) => {
         const userId = req.user._id;
 
         // Only bidders can access
-        if (req.user.userType !== 'bidder') {
-            return res.status(403).json({ success: false, message: "Only bidders can view their payments" });
-        }
+        // if (req.user.userType !== 'bidder') {
+        //     return res.status(403).json({ success: false, message: "Only bidders can view their payments" });
+        // }
 
         // Fetch all payments for this bidder, populate auction details
         const payments = await Payment.find({ bidder: userId })

@@ -36,13 +36,20 @@ export const makeOffer = async (req, res) => {
       });
     }
 
-    // Check if user is a bidder
-    if (buyer.userType !== 'bidder') {
-        return res.status(403).json({
-            success: false,
-            message: 'Only bidders can make offers'
-        });
+    if (!buyer?.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: `Account is not verified. Can't make an offer.`,
+      });
     }
+
+    // Check if user is a bidder
+    // if (buyer.userType !== 'bidder') {
+    //     return res.status(403).json({
+    //         success: false,
+    //         message: 'Only bidders can make offers'
+    //     });
+    // }
 
     // Find auction
     const auction = await Auction.findById(id)
