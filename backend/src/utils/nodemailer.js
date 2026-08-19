@@ -2045,6 +2045,67 @@ const accountApprovedEmail = async (user) => {
     }
 };
 
+// ============================================
+// IDENTITY REJECTED EMAIL (to user)
+// ============================================
+
+const identityRejectedEmail = async (user, rejectionReason, allowReupload = true) => {
+    try {
+        const content = `
+            <h2 style="text-align: center;">❌ Identity Verification Rejected</h2>
+            <p style="text-align: center;">Hello ${user.firstName || user.username},</p>
+            
+            <p>We regret to inform you that your identity verification document has been <strong>rejected</strong> by our admin team.</p>
+            
+            ${createInfoCard(`
+                <p style="margin: 0 0 12px 0; font-size: 16px; font-weight: bold; color: ${BRAND_COLORS.secondary};">Reason for Rejection:</p>
+                
+                <div style="background: #fef2f2; padding: 15px; border-radius: 8px; border-left: 4px solid ${BRAND_COLORS.danger}; margin-top: 8px;">
+                    <p style="margin: 0; color: #991b1b;">${rejectionReason}</p>
+                </div>
+                
+                ${allowReupload ? `
+                    <div style="margin-top: 16px; padding: 15px; background: #fff7ed; border-radius: 8px; border-left: 4px solid ${BRAND_COLORS.warning};">
+                        <p style="margin: 0 0 8px 0; font-weight: 600; color: ${BRAND_COLORS.secondary};">📤 What You Can Do:</p>
+                        <p style="margin: 0; color: ${BRAND_COLORS.text};">You can upload a new, clearer identification document. Please make sure the document is:</p>
+                        <ul style="margin: 8px 0 0 0; padding-left: 20px; color: ${BRAND_COLORS.text};">
+                            <li>Clear and legible</li>
+                            <li>Not expired</li>
+                            <li>Matches your account details</li>
+                        </ul>
+                    </div>
+                ` : `
+                    <div style="margin-top: 16px; padding: 15px; background: #fef2f2; border-radius: 8px; border-left: 4px solid ${BRAND_COLORS.danger};">
+                        <p style="margin: 0; color: #991b1b;">⚠️ You cannot re-upload your document. Please contact support for further assistance.</p>
+                    </div>
+                `}
+            `, 'warning')}
+            
+            <p>If you believe this rejection was in error or need clarification, please contact our support team.</p>
+            
+            <div style="background: ${BRAND_COLORS.grayBg}; padding: 20px; border-radius: 8px; margin: 25px 0; border: 1px solid ${BRAND_COLORS.grayBorder};">
+                <p style="margin: 0 0 12px 0; font-weight: bold; color: ${BRAND_COLORS.secondary};">📞 Need Help?</p>
+                <p style="margin: 0 0 8px 0; color: ${BRAND_COLORS.text};">If you have any questions or need assistance, just reach out to us.</p>
+            </div>
+        `;
+
+        const html = baseTemplate(content, 'Identity Verification Rejected');
+        
+        const info = await transporter.sendMail({
+            from: `"${BRAND_NAME}" <${process.env.EMAIL_USER}>`,
+            to: user.email,
+            subject: `Identity Verification Rejected - ${BRAND_NAME}`,
+            html
+        });
+
+        console.log(`✅ Identity rejection email sent to ${user.email}`);
+        return !!info;
+    } catch (error) {
+        console.error(`❌ Failed to send identity rejection email:`, error);
+        return false;
+    }
+};
+
 // Export all
 export {
     contactEmail,
@@ -2087,4 +2148,5 @@ export {
     shippingUpdatedEmail,
     newMessageNotificationEmail,
     accountApprovedEmail,
+    identityRejectedEmail,
 };

@@ -15,6 +15,7 @@ import {
   accountApprovedEmail,
   auctionApprovedEmail,
   auctionListedEmail,
+  identityRejectedEmail,
   paymentCompletedEmail,
   paymentCompletedSellerEmail,
   sendBulkAuctionNotifications,
@@ -2156,6 +2157,11 @@ export const rejectUserIdentity = async (req, res) => {
     }
 
     await user.save();
+
+    // Send approval email (fire and forget)
+    identityRejectedEmail(user, rejectionReason, true).catch(err =>
+      console.error("Failed to send account approved email:", err)
+    );
 
     res.status(200).json({
       success: true,

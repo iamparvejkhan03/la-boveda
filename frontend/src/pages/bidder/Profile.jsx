@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import axiosInstance from "../../utils/axiosInstance";
 import { useAuth } from "../../contexts/AuthContext";
+import toast from "react-hot-toast";
 
 // Default preferences
 const defaultPreferences = {
