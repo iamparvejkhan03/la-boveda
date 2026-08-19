@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import axiosInstance from "../../utils/axiosInstance";
 import { useAuth } from "../../contexts/AuthContext";
+import toast from "react-hot-toast";
 
 // Default preferences
 const defaultPreferences = {
@@ -69,12 +70,11 @@ function Profile() {
                     createdAt: data.data.user.createdAt,
                     countryName: data.data.user.countryName,
                     countryCode: data.data.user.countryCode,
-                    currency: data.data.user.currency,
                 };
                 localStorage.setItem('user', JSON.stringify(userInfo));
 
                 setUser(userInfo);
-                // setActiveSection(data.data.user?.isVerified ? "personal" : "verification");
+                setActiveSection(data.data.user?.isVerified ? "personal" : "verification");
             } else {
                 setError('Failed to fetch profile data');
             }

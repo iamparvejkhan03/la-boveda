@@ -902,29 +902,23 @@ export const approveAuction = async (req, res) => {
       });
     }
 
-    // Check if auction start date is in the future
     const now = new Date();
     if (auction.startDate > now) {
       auction.status = "approved";
-      // Schedule activation for start date - keep as draft for now
-      await agendaService.scheduleAuctionActivation(
-        auction._id,
-        auction.startDate,
-      );
+      await agendaService.scheduleAuctionActivation(auction._id, auction.startDate);
+      // Fire and forget
       auctionApprovedEmail(auction.seller, auction).catch((error) =>
         console.error("Failed to send auction approved email:", error),
       );
     } else {
-      // Activate immediately
       auction.status = "active";
-
       await auction.populate("seller", "email username companyName firstName lastName");
 
-      await auctionListedEmail(auction, auction.seller).catch((error) =>
+      // Fire and forget
+      auctionListedEmail(auction, auction.seller).catch((error) =>
         console.error("Failed to send auction listed email:", error),
       );
 
-      // If end date is in past, end the auction
       if (auction.endDate <= now) {
         await auction.endAuction();
       }
@@ -932,22 +926,31 @@ export const approveAuction = async (req, res) => {
 
     await auction.save();
 
+    // ✅ Send response immediately
     res.status(200).json({
       success: true,
       message: "Auction approved successfully",
       data: { auction },
     });
 
-    // const bidders = await User.find({ userType: 'bidder' });
-    const bidders = await User.find({
-      _id: { $ne: auction?.seller?._id }, // Exclude auction owner
-      userType: { $ne: "admin" }, // Exclude admin users
-      isActive: true, // Only active users
-    }).select("email username companyName firstName lastName preferences userType currency");
+    // ✅ Fire-and-forget: Fetch bidders and send notifications
+    // This runs after the response is sent
+    setImmediate(async () => {
+      try {
+        const bidders = await User.find({
+          _id: { $ne: auction?.seller?._id },
+          userType: { $ne: "admin" },
+          isActive: true,
+        }).select("email username companyName firstName lastName preferences userType currency");
 
-    sendBulkAuctionNotifications(bidders, auction, auction.seller).catch((error) =>
-      console.error("Failed to send bulk auction notifications email:", error),
-    );
+        if (bidders.length > 0) {
+          await sendBulkAuctionNotifications(bidders, auction, auction.seller);
+        }
+      } catch (error) {
+        console.error("Failed to send bulk auction notifications:", error);
+      }
+    });
+
   } catch (error) {
     console.error("Approve auction error:", error);
     res.status(500).json({
