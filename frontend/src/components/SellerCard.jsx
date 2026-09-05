@@ -133,7 +133,7 @@ const SellerCard = ({ seller }) => {
           <div className="my-5 h-px bg-gray-100" />
 
           {/* Statistics */}
-          <div className="grid grid-cols-4 divide-x divide-gray-100">
+          <div className="grid grid-cols-3 divide-x divide-gray-100">
 
             {/* Listed */}
             <div className="px-2 text-center first:pl-0">
@@ -184,7 +184,7 @@ const SellerCard = ({ seller }) => {
             </div>
 
             {/* Bids */}
-            <div className="px-2 text-center last:pr-0">
+            {/* <div className="px-2 text-center last:pr-0">
               <TrendingUp
                 size={16}
                 className="mx-auto mb-1 text-blue-500"
@@ -197,7 +197,7 @@ const SellerCard = ({ seller }) => {
               <p className="text-[11px] uppercase tracking-wide text-gray-400">
                 Bids
               </p>
-            </div>
+            </div> */}
           </div>
 
           {/* Success bar */}

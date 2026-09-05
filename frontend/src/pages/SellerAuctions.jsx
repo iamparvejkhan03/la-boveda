@@ -246,10 +246,10 @@ function SellerAuctions() {
         stats.soldCount ??
         0;
 
-    const totalBids =
-        stats.bids ??
-        stats.totalBids ??
-        0;
+    // const totalBids =
+    //     stats.bids ??
+    //     stats.totalBids ??
+    //     0;
 
     const successRate = Math.min(
         100,
@@ -454,7 +454,7 @@ function SellerAuctions() {
                         </div>
 
                         {/* Seller stats */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 lg:w-[520px] border border-gray-100 rounded-xl overflow-hidden bg-gray-50/70">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:w-[520px] border border-gray-100 rounded-xl overflow-hidden bg-gray-50/70">
 
                             <SellerStat
                                 icon={<Package size={18} />}
@@ -474,11 +474,11 @@ function SellerAuctions() {
                                 value={soldCount}
                             />
 
-                            <SellerStat
+                            {/* <SellerStat
                                 icon={<Gavel size={18} />}
                                 label="Bids"
                                 value={totalBids}
-                            />
+                            /> */}
 
                         </div>
 

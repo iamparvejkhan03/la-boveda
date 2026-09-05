@@ -256,7 +256,7 @@ const CommunicationDetail = () => {
                         {/* Back button and title */}
                         <div className="flex items-center gap-4 mb-6">
                             <Link
-                                to="/admin/communications"
+                                to="/admin/communications/all"
                                 className="p-2 bg-white rounded-full shadow hover:shadow-md transition"
                             >
                                 <ArrowLeft size={20} className="text-gray-700" />

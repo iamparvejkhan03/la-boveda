@@ -88,11 +88,11 @@ const navigation = [
         path: '/admin/payouts',
         icon: <BanknoteArrowDown size={20} />
     },
-    {
-        name: 'Bank Details',
-        path: '/admin/payout-methods',
-        icon: <BanknoteArrowUp size={20} />
-    },
+    // {
+    //     name: 'Bank Details',
+    //     path: '/admin/payout-methods',
+    //     icon: <BanknoteArrowUp size={20} />
+    // },
     {
         name: 'Commissions',
         path: '/admin/commissions',

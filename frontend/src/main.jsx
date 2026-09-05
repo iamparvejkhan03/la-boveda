@@ -623,14 +623,14 @@ createRoot(document.getElementById('root')).render(
                         />
 
                         {/* Admin Payout Methods */}
-                        <Route
+                        {/* <Route
                             path='/admin/payout-methods'
                             element={
                                 <Suspense fallback={<LoadingSpinner height={'750px'} />}>
                                     <AdminPayoutMethods />
                                 </Suspense>
                             }
-                        />
+                        /> */}
 
                         {/* Admin Transactions */}
                         {/* <Route
