@@ -2,11 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-*{
+* {
     font-family: Outfit;
 }
 
-/* Add this to your CSS file or in a style tag */
+/* Toggle */
 .toggle-checkbox:checked + .toggle-label {
     background-color: #10B981;
 }
@@ -38,21 +38,54 @@
 }
 
 @keyframes dashFlow {
-  to {
-    stroke-dashoffset: -100;
-  }
+    to {
+        stroke-dashoffset: -100;
+    }
 }
 
 .animate-dash {
-  stroke-dashoffset: 0;
-  animation: dashFlow 4s linear infinite;
+    stroke-dashoffset: 0;
+    animation: dashFlow 4s linear infinite;
 }
 
 @keyframes sweep {
-  0% { left: -60%; }
-  100% { left: 130%; }
+    0% {
+        left: -60%;
+    }
+
+    100% {
+        left: 130%;
+    }
 }
 
 .animate-sweep {
-  animation: sweep 4s linear infinite;
+    animation: sweep 4s linear infinite;
+}
+
+/* ========================================
+   GOOGLE TRANSLATE
+======================================== */
+
+/* Hide Google Translate top banner */
+.goog-te-banner-frame,
+iframe.goog-te-banner-frame {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* Hide Google Translate injected banner container */
+body > .skiptranslate {
+    display: none !important;
+}
+
+/* Prevent Google Translate from shifting the page */
+html,
+body {
+    top: 0 !important;
+}
+
+/* Hide Google Translate widget */
+.goog-te-gadget,
+.goog-te-gadget-simple {
+    display: none !important;
 }

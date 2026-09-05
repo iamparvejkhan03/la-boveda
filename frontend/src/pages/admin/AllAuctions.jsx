@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AdminContainer, AdminHeader, AdminSidebar, LoadingSpinner, PaymentStatusDropdown } from "../../components";
-import { Search, Filter, Gavel, Clock, Eye, Edit, Shield, TrendingUp, User, Award, MoreVertical, Trash2, AlertTriangle, CheckCircle, Star, Crown, Plus, FileText, Banknote, RefreshCcw } from "lucide-react";
+import { Search, Filter, Gavel, Clock, Eye, Edit, Shield, TrendingUp, User, Award, MoreVertical, Trash2, AlertTriangle, CheckCircle, Star, Crown, Plus, FileText, Banknote, RefreshCcw, MessagesSquare } from "lucide-react";
 import { about } from "../../assets";
 import toast from "react-hot-toast";
 import axiosInstance from "../../utils/axiosInstance";
@@ -447,7 +447,7 @@ function AllAuctions() {
                                             {/* <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bids/Watchers</th> */}
                                             <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                             <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
-                                            <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                            <th className="py-3 px-6 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200">
@@ -606,7 +606,14 @@ function AllAuctions() {
                                                 </td>
 
                                                 <td className="py-4 px-6">
-                                                    <div className="flex items-center gap-1">
+                                                    <div className="flex items-center justify-end gap-1">
+                                                        {(auction?.status === 'sold' || auction?.status === 'sold_buy_now') && <Link
+                                                            to={`/admin/communication/${auction?._id}`}
+                                                            className="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+                                                        >
+                                                            <MessagesSquare size={16} />
+                                                        </Link>}
+
                                                         <button
                                                             onClick={() => openAuctionModal(auction)}
                                                             className="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"

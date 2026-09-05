@@ -15,6 +15,7 @@ import {
     Edit3,
 } from "lucide-react";
 import { format } from "date-fns";
+import toast from "react-hot-toast";
 
 const Communication = () => {
     const { auctionId } = useParams();
@@ -104,24 +105,34 @@ const Communication = () => {
         });
 
         try {
-            const { data } = await axiosInstance.post(
-                `/api/v1/communication/${auctionId}/message`,
-                formData,
+            await toast.promise(
+                axiosInstance.post(
+                    `/api/v1/communication/${auctionId}/message`,
+                    formData,
+                    { headers: { "Content-Type": "multipart/form-data" } }
+                ),
                 {
-                    headers: { "Content-Type": "multipart/form-data" },
+                    loading: "Sending message...",
+                    success: (response) => {
+                        if (response.data.success) {
+                            // 🔁 Refresh from server to apply filtering
+                            fetchCommunication();
+                            setNewMessage("");
+                            setAttachments([]);
+                            if (fileInputRef.current) fileInputRef.current.value = "";
+                            return "Message sent successfully!";
+                        } else {
+                            throw new Error("Failed to send message");
+                        }
+                    },
+                    error: (err) => {
+                        console.error(err);
+                        return err.response?.data?.message || "Error sending message";
+                    },
                 }
             );
-            if (data.success) {
-                setCommunication(data.data);
-                setNewMessage("");
-                setAttachments([]);
-                if (fileInputRef.current) fileInputRef.current.value = "";
-            } else {
-                alert("Failed to send message");
-            }
-        } catch (err) {
-            console.error(err);
-            alert("Error sending message");
+        } catch (error) {
+            console.error("Toast promise error:", error);
         } finally {
             setSending(false);
         }
@@ -452,7 +463,7 @@ const Communication = () => {
                             </div>
 
                             {/* Participants */}
-                            <div className="bg-white rounded-xl shadow border border-gray-200 p-4">
+                            {/* <div className="bg-white rounded-xl shadow border border-gray-200 p-4">
                                 <h3 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
                                     <User size={18} /> Participants
                                 </h3>
@@ -460,7 +471,7 @@ const Communication = () => {
                                     <p><span className="text-gray-500">Seller:</span> {seller?.firstName || seller?.username}</p>
                                     <p><span className="text-gray-500">Winning Bidder:</span> {winningBidder?.firstName || winningBidder?.username}</p>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </BidderContainer>

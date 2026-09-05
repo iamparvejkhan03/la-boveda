@@ -617,11 +617,11 @@ function WonAuctions() {
                                             to={`/bidder/communication/${auction?._id}`}
                                             className="flex-1 text-center bg-[#C59D55] text-white hover:bg-[#C59D55]/90 py-3 px-6 rounded-lg font-semibold transition-all"
                                         >
-                                            Communication
+                                            Contact Admin
                                         </Link>
 
                                         {/* Action Button - Single button that handles both payment methods */}
-                                        {auction?.paymentStatus == 'pending' && <button
+                                        {/* {auction?.paymentStatus == 'pending' && <button
                                             onClick={() => {
                                                 setProcessing(true);
                                                 // setShowBankDetailsModal(true);
@@ -642,7 +642,7 @@ function WonAuctions() {
                                                     Pay {formatCurrency(calculateTotal(auction))} via Bank Transfer
                                                 </>
                                             )}
-                                        </button>}
+                                        </button>} */}
                                     </div>
                                 </div>
                             </div>

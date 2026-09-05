@@ -1856,13 +1856,14 @@ const paymentInitiatedAdminEmail = async (adminEmail, payment, buyer, auction) =
 // SHIPPING UPDATED EMAIL (to winning bidder)
 // ============================================
 
-const shippingUpdatedEmail = async (winningBidder, auction, shippingInfo, updatedBy, userRole) => {
+const shippingUpdatedEmail = async (recipient, auction, shippingInfo, updatedBy, userRole) => {
     try {
+        // recipient is a user object (admin or winning bidder)
         const content = `
             <h2 style="text-align: center;">🚚 Shipping Information Updated</h2>
-            <p style="text-align: center;">Hello ${winningBidder.firstName || winningBidder.username},</p>
+            <p style="text-align: center;">Hello ${recipient.firstName || recipient.username},</p>
             
-            <p>The shipping details for your won item <strong>${auction.title}</strong> have been updated by <strong>${userRole}</strong>.</p>
+            <p>The shipping details for the auction <strong>${auction.title}</strong> have been updated by <strong>${userRole}</strong>.</p>
             
             ${createInfoCard(`
                 <p style="margin: 0 0 12px 0; font-size: 18px; font-weight: bold; color: ${BRAND_COLORS.secondary};">${auction.title}</p>
@@ -1884,7 +1885,10 @@ const shippingUpdatedEmail = async (winningBidder, auction, shippingInfo, update
                 ` : ''}
             `)}
             
-            <p>You can track your shipment using the provided tracking number. If you have any questions, please contact the seller or our support team.</p>
+            ${userRole === 'Admin' ?
+                `<p>You can track your shipment using the provided tracking number. If you have any questions, please contact our support team.</p>` :
+                `<p>Please review the shipping details and confirm with the buyer. If you need any changes, you can update them again.</p>`
+            }
             
             <div style="text-align: center; margin: 25px 0;">
                 ${createButton('View Auction Details', `${FRONTEND_URL}/auction/${auction._id}`, 'primary')}
@@ -1899,12 +1903,12 @@ const shippingUpdatedEmail = async (winningBidder, auction, shippingInfo, update
 
         const info = await transporter.sendMail({
             from: `"${BRAND_NAME}" <${process.env.EMAIL_USER}>`,
-            to: winningBidder.email,
+            to: recipient.email,
             subject: `Shipping Update - ${auction.title}`,
             html
         });
 
-        console.log(`✅ Shipping update email sent to winning bidder ${winningBidder.email}`);
+        console.log(`✅ Shipping update email sent to ${recipient.email}`);
         return !!info;
     } catch (error) {
         console.error(`❌ Failed to send shipping update email:`, error);
@@ -2029,7 +2033,7 @@ const accountApprovedEmail = async (user) => {
         `;
 
         const html = baseTemplate(content, 'Account Approved');
-        
+
         const info = await transporter.sendMail({
             from: `"${BRAND_NAME}" <${process.env.EMAIL_USER}>`,
             to: user.email,
@@ -2090,7 +2094,7 @@ const identityRejectedEmail = async (user, rejectionReason, allowReupload = true
         `;
 
         const html = baseTemplate(content, 'Identity Verification Rejected');
-        
+
         const info = await transporter.sendMail({
             from: `"${BRAND_NAME}" <${process.env.EMAIL_USER}>`,
             to: user.email,

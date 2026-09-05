@@ -104,25 +104,39 @@ const SellerCommunication = () => {
         setSending(true);
         const formData = new FormData();
         formData.append("content", newMessage);
-        attachments.forEach((file) => formData.append("attachments", file));
+        attachments.forEach((file) => {
+            formData.append("attachments", file);
+        });
 
         try {
-            const { data } = await axiosInstance.post(
-                `/api/v1/communication/${auctionId}/message`,
-                formData,
-                { headers: { "Content-Type": "multipart/form-data" } }
+            await toast.promise(
+                axiosInstance.post(
+                    `/api/v1/communication/${auctionId}/message`,
+                    formData,
+                    { headers: { "Content-Type": "multipart/form-data" } }
+                ),
+                {
+                    loading: "Sending message...",
+                    success: (response) => {
+                        if (response.data.success) {
+                            // 🔁 Refresh from server to apply filtering
+                            fetchCommunication();
+                            setNewMessage("");
+                            setAttachments([]);
+                            if (fileInputRef.current) fileInputRef.current.value = "";
+                            return "Message sent successfully!";
+                        } else {
+                            throw new Error("Failed to send message");
+                        }
+                    },
+                    error: (err) => {
+                        console.error(err);
+                        return err.response?.data?.message || "Error sending message";
+                    },
+                }
             );
-            if (data.success) {
-                setCommunication(data.data);
-                setNewMessage("");
-                setAttachments([]);
-                if (fileInputRef.current) fileInputRef.current.value = "";
-            } else {
-                alert("Failed to send message");
-            }
-        } catch (err) {
-            console.error(err);
-            alert("Error sending message");
+        } catch (error) {
+            console.error("Toast promise error:", error);
         } finally {
             setSending(false);
         }
@@ -152,7 +166,8 @@ const SellerCommunication = () => {
                 payload
             );
             if (data.success) {
-                setCommunication(data.data);
+                // 🔁 Refresh from server to apply filtering
+                fetchCommunication();
                 toast.success("Shipping info updated");
             } else {
                 alert("Failed to update shipping");
@@ -437,7 +452,7 @@ const SellerCommunication = () => {
                             </div>
 
                             {/* Participants */}
-                            <div className="bg-white rounded-xl shadow border border-gray-200 p-4">
+                            {/* <div className="bg-white rounded-xl shadow border border-gray-200 p-4">
                                 <h3 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
                                     <User size={18} /> Participants
                                 </h3>
@@ -451,7 +466,7 @@ const SellerCommunication = () => {
                                         {winningBidder?.firstName || winningBidder?.username}
                                     </p>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </SellerContainer>

@@ -25,6 +25,7 @@ function Hero() {
     const navigate = useNavigate();
     const searchForm = useForm();
     const [activeCategory, setActiveCategory] = useState("All");
+    const [searchType, setSearchType] = useState("auction");
 
     const categories = [
         { name: "Sports Cards", icon: Trophy },
@@ -57,13 +58,15 @@ function Hero() {
     };
 
     const handleSearch = (data) => {
-        const params = new URLSearchParams();
+        if (!data.search?.trim()) return;
 
-        if (data.search) {
-            params.append("search", data.search);
+        const search = encodeURIComponent(data.search.trim());
+
+        if (searchType === "seller") {
+            navigate(`/sellers?search=${search}`);
+        } else {
+            navigate(`/auctions?search=${search}`);
         }
-
-        navigate(`/auctions?${params.toString()}`);
     };
 
     const handleCategory = (category) => {
@@ -177,6 +180,21 @@ function Hero() {
                             >
                                 <div className="group flex flex-col gap-2 rounded-2xl border border-white/10 bg-white/[0.055] p-2 shadow-2xl shadow-black/20 backdrop-blur-xl sm:flex-row">
 
+                                    <div className="flex items-center border-b border-white/10 px-3 sm:border-b-0 sm:border-r">
+                                        <select
+                                            value={searchType}
+                                            onChange={(e) => setSearchType(e.target.value)}
+                                            className="h-14 cursor-pointer bg-transparent text-sm font-medium text-white outline-none min-w-20"
+                                        >
+                                            <option value="auction" className="bg-[#11161B]">
+                                                Auctions
+                                            </option>
+                                            <option value="seller" className="bg-[#11161B]">
+                                                Sellers
+                                            </option>
+                                        </select>
+                                    </div>
+
                                     <div className="relative flex-1">
                                         <Search
                                             size={20}
@@ -185,7 +203,7 @@ function Hero() {
 
                                         <input
                                             type="text"
-                                            placeholder="Search cards, jerseys, players..."
+                                            placeholder="Search seller's name, cards, jerseys, players..."
                                             className="h-14 w-full rounded-xl bg-transparent pl-12 pr-4 text-sm text-white outline-none placeholder:text-white/30"
                                             {...searchForm.register("search")}
                                         />
@@ -330,7 +348,7 @@ function Hero() {
                                 ) : (
                                     <>
                                         <img
-                                            src={hotListing? hotListing?.photos[0]?.url : heroImg}
+                                            src={hotListing ? hotListing?.photos[0]?.url : heroImg}
                                             alt="Hot collectible"
                                             className="h-full w-full object-cover opacity-80"
                                         />

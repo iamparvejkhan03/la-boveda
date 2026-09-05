@@ -21,6 +21,8 @@ const BuyerAgreement = lazy(() => import('./pages/BuyerAgreement'));
 const SingleAuction = lazy(() => import('./pages/SingleAuction'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const FAQs = lazy(() => import('./pages/FAQs'));
+const Sellers = lazy(() => import('./pages/Sellers'));
+const SingleSeller = lazy(() => import('./pages/SellerAuctions'));
 
 {/* Seller Pages */ }
 const SellerLayout = lazy(() => import('./pages/seller/Layout'));
@@ -108,6 +110,10 @@ createRoot(document.getElementById('root')).render(
                         <Route path='/auctions' index={true} element={<Suspense fallback={<LoadingSpinner height={'725px'} />}><Auctions /></Suspense>} />
 
                         <Route path='/auction/:id' index={true} element={<Suspense fallback={<LoadingSpinner height={'725px'} />}><SingleAuction /></Suspense>} />
+
+                        <Route path='/sellers' index={true} element={<Suspense fallback={<LoadingSpinner height={'725px'} />}><Sellers /></Suspense>} />
+
+                        <Route path='/seller/:sellerId' index={true} element={<Suspense fallback={<LoadingSpinner height={'725px'} />}><SingleSeller /></Suspense>} />
 
                         <Route path='/privacy-policy' index={true} element={<Suspense fallback={<LoadingSpinner height={'725px'} />}><PrivacyPolicy /></Suspense>} />
 

@@ -310,7 +310,7 @@ function SoldAuctions() {
                                             to={`/seller/communication/${selectedAuction.id}`}
                                             className="flex-1 text-center border border-[#C59D55] text-[#C59D55] hover:bg-[#C59D55] hover:text-white py-3 px-6 rounded-lg font-semibold transition-all"
                                         >
-                                            Communication
+                                            Contact Admin
                                         </Link>
                                         {/* <div>
                                             <button

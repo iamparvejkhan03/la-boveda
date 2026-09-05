@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-hot-toast';
 import axiosInstance from '../utils/axiosInstance';
 import { useLocation } from "react-router-dom";
 
-export const useAuctions = () => {
+export const useAuctions = (initialFilters = {}) => {
     const location = useLocation();
     const [auctions, setAuctions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
     const [pagination, setPagination] = useState(null);
-    const [filters, setFilters] = useState({
+
+    // Default filters
+    const defaultFilters = {
         categories: [],
         status: 'active',
         search: '',
@@ -18,7 +20,6 @@ export const useAuctions = () => {
         location: '',
         sortBy: 'createdAt',
         sortOrder: 'desc',
-        // Add all the new car filters
         make: '',
         model: '',
         yearMin: '',
@@ -27,47 +28,50 @@ export const useAuctions = () => {
         fuelType: '',
         condition: '',
         auctionType: '',
-        allowOffers: ''
-    });
+        allowOffers: '',
+        seller: '',
+    };
 
-    // Clean filters - remove empty values
+    // Merge initialFilters with defaults
+    const [filters, setFilters] = useState({ ...defaultFilters, ...initialFilters });
+
+    // Refs to track changes
+    const initialFiltersRef = useRef(initialFilters);
+    const previousUrlRef = useRef('');
+    const isFirstRender = useRef(true);
+
+    const hasInitialFilters = Object.keys(initialFilters).length > 0;
+
+    // Clean empty values from filters
     const cleanFilters = (currentFilters) => {
         return Object.fromEntries(
             Object.entries(currentFilters).filter(([key, value]) => {
-                // Special handling for categories array
                 if (key === 'categories') {
                     return Array.isArray(value) && value.length > 0;
                 }
-                // For other fields
                 return value !== '' && value !== null && value !== undefined && value !== false;
             })
         );
     };
 
-    // Fetch auctions with pagination and filters
-    const fetchAuctions = async (page = 1, limit = 12, currentFilters = {}) => {
+    // Core fetch function
+    const fetchAuctions = async (page = 1, limit = 12, currentFilters = null) => {
+        const filtersToUse = currentFilters || filters;
         const loadingState = page > 1 ? setLoadingMore : setLoading;
         loadingState(true);
 
         try {
-            // Clean up filters
-            const clean = cleanFilters(currentFilters);
-
-            // Build query string with all filters
+            const clean = cleanFilters(filtersToUse);
             const params = new URLSearchParams({
                 page: page.toString(),
                 limit: limit.toString(),
-                // Copy all filters except categories
                 ...Object.fromEntries(
                     Object.entries(clean).filter(([key]) => key !== 'categories')
                 )
             });
 
-            // Handle categories array separately - append each category
             if (clean.categories && Array.isArray(clean.categories) && clean.categories.length > 0) {
-                clean.categories.forEach(cat => {
-                    params.append('categories', cat);
-                });
+                clean.categories.forEach(cat => params.append('categories', cat));
             }
 
             const queryString = params.toString();
@@ -75,10 +79,8 @@ export const useAuctions = () => {
 
             if (data.success) {
                 if (page > 1) {
-                    // Append new auctions for pagination
                     setAuctions(prev => [...prev, ...data.data.auctions]);
                 } else {
-                    // Replace auctions for first load or filter change
                     setAuctions(data.data.auctions);
                 }
                 setPagination(data.data.pagination);
@@ -91,7 +93,7 @@ export const useAuctions = () => {
         }
     };
 
-    // Load more auctions
+    // Load more (pagination)
     const loadMoreAuctions = async () => {
         if (pagination?.currentPage < pagination?.totalPages) {
             const nextPage = pagination.currentPage + 1;
@@ -99,58 +101,71 @@ export const useAuctions = () => {
         }
     };
 
-    // Update filters and refresh auctions
+    // Update filters and refresh
     const updateFilters = (newFilters) => {
         const updatedFilters = { ...filters, ...newFilters };
         setFilters(updatedFilters);
         fetchAuctions(1, 12, updatedFilters);
     };
 
-    // Handle URL parameters on initial load
+    // ----- EFFECT: Handle initialFilters and URL params -----
     useEffect(() => {
-        const searchParams = new URLSearchParams(location.search);
+        if (hasInitialFilters) {
+            // ---- CASE 1: initialFilters provided (e.g., Seller page) ----
+            const current = initialFilters;
+            const prev = initialFiltersRef.current;
+            const currentStr = JSON.stringify(current);
+            const prevStr = JSON.stringify(prev);
 
-        // Handle categories from URL (can be comma-separated string)
-        let categories = [];
-        const categoriesParam = searchParams.get('categories');
-        if (categoriesParam) {
-            categories = categoriesParam.split(',').filter(cat => cat.trim() !== '');
-        }
-
-        // Extract ALL URL parameters including new ones
-        const urlFilters = {
-            categories: categories, // Now an array
-            status: searchParams.get('status') || 'active',
-            search: searchParams.get('search') || '',
-            priceMin: searchParams.get('priceMin') || '',
-            priceMax: searchParams.get('priceMax') || '',
-            location: searchParams.get('location') || '',
-            // New car filters from URL
-            make: searchParams.get('make') || '',
-            model: searchParams.get('model') || '',
-            yearMin: searchParams.get('yearMin') || '',
-            yearMax: searchParams.get('yearMax') || '',
-            transmission: searchParams.get('transmission') || '',
-            fuelType: searchParams.get('fuelType') || '',
-            condition: searchParams.get('condition') || '',
-            auctionType: searchParams.get('auctionType') || '',
-            allowOffers: searchParams.get('allowOffers') || '',
-            sortBy: searchParams.get('sortBy') || 'createdAt',
-            sortOrder: searchParams.get('sortOrder') || 'desc'
-        };
-
-        // Clean empty values
-        const cleanUrlFilters = cleanFilters(urlFilters);
-
-        if (Object.keys(cleanUrlFilters).length > 0) {
-            // If we have URL parameters, use them for initial fetch
-            setFilters(urlFilters);
-            fetchAuctions(1, 12, urlFilters);
+            if (currentStr !== prevStr || isFirstRender.current) {
+                initialFiltersRef.current = current;
+                const merged = { ...defaultFilters, ...current };
+                setFilters(merged);
+                fetchAuctions(1, 12, merged);
+            }
         } else {
-            // If no URL parameters, fetch with default filters
-            fetchAuctions(1, 12, filters);
+            // ---- CASE 2: No initialFilters → use URL params (Auctions page) ----
+            const searchParams = new URLSearchParams(location.search);
+
+            // Parse categories (comma-separated)
+            let categories = [];
+            const categoriesParam = searchParams.get('categories');
+            if (categoriesParam) {
+                categories = categoriesParam.split(',').filter(c => c.trim() !== '');
+            }
+
+            const urlFilters = {
+                categories,
+                status: searchParams.get('status') || 'active',
+                search: searchParams.get('search') || '',
+                priceMin: searchParams.get('priceMin') || '',
+                priceMax: searchParams.get('priceMax') || '',
+                location: searchParams.get('location') || '',
+                make: searchParams.get('make') || '',
+                model: searchParams.get('model') || '',
+                yearMin: searchParams.get('yearMin') || '',
+                yearMax: searchParams.get('yearMax') || '',
+                transmission: searchParams.get('transmission') || '',
+                fuelType: searchParams.get('fuelType') || '',
+                condition: searchParams.get('condition') || '',
+                auctionType: searchParams.get('auctionType') || '',
+                allowOffers: searchParams.get('allowOffers') || '',
+                sortBy: searchParams.get('sortBy') || 'createdAt',
+                sortOrder: searchParams.get('sortOrder') || 'desc',
+                seller: searchParams.get('seller') || '', // optional, if you ever want to pass seller in URL
+            };
+
+            const urlStr = JSON.stringify(urlFilters);
+            if (urlStr !== previousUrlRef.current || isFirstRender.current) {
+                previousUrlRef.current = urlStr;
+                const merged = { ...defaultFilters, ...urlFilters };
+                setFilters(merged);
+                fetchAuctions(1, 12, merged);
+            }
         }
-    }, [location.search]);
+
+        isFirstRender.current = false;
+    }, [initialFilters, location.search]); // Re-run when initialFilters or URL changes
 
     return {
         auctions,
@@ -160,6 +175,6 @@ export const useAuctions = () => {
         filters,
         fetchAuctions,
         loadMoreAuctions,
-        updateFilters
+        updateFilters,
     };
 };

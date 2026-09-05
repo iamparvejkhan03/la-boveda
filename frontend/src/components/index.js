@@ -59,6 +59,8 @@ import AuctionListItem from "./AuctionListItem";
 import CategoryCarousel from "./CategoryCarousel";
 import HowItWorks from "./HowItWorks";
 import TestimonialSection from "./TestimonialSection";
+import LanguageSwitcher from "./LanguageSwitcher";
+import SellerCard from "./SellerCard";
 
 export {
     Container,
@@ -122,4 +124,6 @@ export {
     CategoryCarousel,
     HowItWorks,
     TestimonialSection,
+    LanguageSwitcher,
+    SellerCard,
 }

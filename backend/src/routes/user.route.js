@@ -4,6 +4,8 @@ import {
     deleteIdentification,
     forgotPassword,
     getBillingInfo,
+    getSellers,
+    getUserPublic,
     getVerificationStatus,
     loginUser, 
     refreshAccessToken, 
@@ -31,6 +33,8 @@ userRouter.post('/login', loginUser);
 userRouter.post('/refresh-token', refreshAccessToken);
 userRouter.post('/forgot-password', forgotPassword);
 userRouter.post('/reset-password/:token', resetPassword);
+userRouter.get('/sellers', getSellers);
+userRouter.get('/:userId', getUserPublic);
 
 // Protected routes
 userRouter.get('/profile', auth, getProfile);

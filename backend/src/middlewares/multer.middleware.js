@@ -13,6 +13,7 @@ const fileFilter = (req, file, cb) => {
   } else if (
     file.fieldname === "photos" ||
     file.fieldname === "logbooks" ||
+    file.fieldname === "attachments" ||
     file.fieldname === "serviceRecords"
   ) {
     if (file.mimetype.startsWith("image/")) {
@@ -25,7 +26,7 @@ const fileFilter = (req, file, cb) => {
         false
       );
     }
-  } else if (file.fieldname === "identificationDocument" || file.fieldname === "idDocument") {
+  } else if (file.fieldname === "identificationDocument" || file.fieldname === "idDocument" || file.fieldname === "attachments") {
     const allowedMimeTypes = [
       "image/jpeg",
       "image/jpg",

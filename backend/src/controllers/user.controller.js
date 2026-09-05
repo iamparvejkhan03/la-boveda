@@ -9,6 +9,7 @@ import {
 import crypto from "crypto";
 import BidPayment from "../models/bidPayment.model.js";
 import { deleteFromCloudinary, uploadDocumentToCloudinary, uploadImageToCloudinary } from "../utils/cloudinary.js";
+import Auction from "../models/auction.model.js";
 
 // Helper function to generate tokens and set cookies
 const generateTokensAndRespond = async (user, req, res, message) => {
@@ -734,6 +735,546 @@ export const deleteIdentification = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to delete identification document",
+    });
+  }
+};
+
+// Add this function
+// export const getSellers = async (req, res) => {
+//   try {
+//     const { page = 1, limit = 12, search = '', location = '' } = req.query;
+
+//     const filter = { userType: { $in: ['seller', 'broker'] }, isActive: true };
+
+//     if (search) {
+//       filter.$or = [
+//         { firstName: { $regex: search, $options: 'i' } },
+//         { lastName: { $regex: search, $options: 'i' } },
+//         { username: { $regex: search, $options: 'i' } },
+//         { email: { $regex: search, $options: 'i' } },
+//         { companyName: { $regex: search, $options: 'i' } },
+//       ];
+//     }
+
+//     if (location) {
+//       filter['address.city'] = { $regex: location, $options: 'i' };
+//       // or use country, state, etc.
+//     }
+
+//     const skip = (parseInt(page) - 1) * parseInt(limit);
+
+//     // Aggregate to get auction count for each seller (optional)
+//     const sellers = await User.aggregate([
+//       { $match: filter },
+//       {
+//         $lookup: {
+//           from: 'auctions',
+//           localField: '_id',
+//           foreignField: 'seller',
+//           as: 'auctions'
+//         }
+//       },
+//       {
+//         $addFields: {
+//           auctionCount: { $size: '$auctions' },
+//           // optionally total revenue or average rating
+//         }
+//       },
+//       { $sort: { createdAt: -1 } },
+//       { $skip: skip },
+//       { $limit: parseInt(limit) },
+//       {
+//         $project: {
+//           password: 0,
+//           refreshToken: 0,
+//           resetPasswordToken: 0,
+//           resetPasswordTokenExpiry: 0,
+//           emailVerificationToken: 0,
+//           emailVerificationExpiry: 0,
+//           identificationDocument: 0,
+//           identificationDocumentPublicId: 0,
+//           payoutMethods: 0,
+//         }
+//       }
+//     ]);
+
+//     const total = await User.countDocuments(filter);
+
+//     res.status(200).json({
+//       success: true,
+//       data: {
+//         sellers,
+//         pagination: {
+//           currentPage: parseInt(page),
+//           totalPages: Math.ceil(total / limit),
+//           totalSellers: total,
+//         }
+//       }
+//     });
+//   } catch (error) {
+//     console.error('Get sellers error:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Internal server error while fetching sellers'
+//     });
+//   }
+// };
+
+export const getSellers = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 12,
+      search = "",
+      location = "",
+    } = req.query;
+
+    const filter = {
+      userType: { $in: ["seller", "broker"] },
+      isActive: true,
+    };
+
+    if (search) {
+      filter.$or = [
+        { firstName: { $regex: search, $options: "i" } },
+        { lastName: { $regex: search, $options: "i" } },
+        { username: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+        { companyName: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    if (location) {
+      filter["address.city"] = {
+        $regex: location,
+        $options: "i",
+      };
+    }
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const sellers = await User.aggregate([
+      // --------------------------------------------------
+      // 1. Find sellers
+      // --------------------------------------------------
+      {
+        $match: filter,
+      },
+
+      // --------------------------------------------------
+      // 2. Get their auctions
+      // --------------------------------------------------
+      {
+        $lookup: {
+          from: "auctions",
+          let: { sellerId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$seller", "$$sellerId"],
+                },
+              },
+            },
+            {
+              $project: {
+                status: 1,
+                bidCount: 1,
+                finalPrice: 1,
+                currentPrice: 1,
+              },
+            },
+          ],
+          as: "auctions",
+        },
+      },
+
+      // --------------------------------------------------
+      // 3. Calculate seller statistics
+      // --------------------------------------------------
+      {
+        $addFields: {
+          // Total listings excluding drafts
+          listedCount: {
+            $size: {
+              $filter: {
+                input: "$auctions",
+                as: "auction",
+                cond: {
+                  $ne: ["$$auction.status", "draft"],
+                },
+              },
+            },
+          },
+
+          // Currently active
+          activeCount: {
+            $size: {
+              $filter: {
+                input: "$auctions",
+                as: "auction",
+                cond: {
+                  $eq: ["$$auction.status", "active"],
+                },
+              },
+            },
+          },
+
+          // Successfully sold
+          soldCount: {
+            $size: {
+              $filter: {
+                input: "$auctions",
+                as: "auction",
+                cond: {
+                  $in: [
+                    "$$auction.status",
+                    ["sold", "sold_buy_now"],
+                  ],
+                },
+              },
+            },
+          },
+
+          // Auctions that have reached an outcome
+          completedCount: {
+            $size: {
+              $filter: {
+                input: "$auctions",
+                as: "auction",
+                cond: {
+                  $in: [
+                    "$$auction.status",
+                    [
+                      "sold",
+                      "sold_buy_now",
+                      "ended",
+                      "reserve_not_met",
+                    ],
+                  ],
+                },
+              },
+            },
+          },
+
+          // Total bids received
+          totalBids: {
+            $sum: {
+              $map: {
+                input: "$auctions",
+                as: "auction",
+                in: {
+                  $ifNull: ["$$auction.bidCount", 0],
+                },
+              },
+            },
+          },
+
+          // Total sales value
+          totalSalesValue: {
+            $sum: {
+              $map: {
+                input: "$auctions",
+                as: "auction",
+                in: {
+                  $cond: [
+                    {
+                      $in: [
+                        "$$auction.status",
+                        ["sold", "sold_buy_now"],
+                      ],
+                    },
+                    {
+                      $ifNull: [
+                        "$$auction.finalPrice",
+                        "$$auction.currentPrice",
+                      ],
+                    },
+                    0,
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+
+      // --------------------------------------------------
+      // 4. Success percentage
+      // --------------------------------------------------
+      {
+        $addFields: {
+          successRate: {
+            $cond: [
+              { $gt: ["$completedCount", 0] },
+              {
+                $round: [
+                  {
+                    $multiply: [
+                      {
+                        $divide: [
+                          "$soldCount",
+                          "$completedCount",
+                        ],
+                      },
+                      100,
+                    ],
+                  },
+                  0,
+                ],
+              },
+              null,
+            ],
+          },
+        },
+      },
+
+      // --------------------------------------------------
+      // 5. Don't expose sensitive information
+      // --------------------------------------------------
+      {
+        $project: {
+          password: 0,
+          refreshToken: 0,
+          resetPasswordToken: 0,
+          resetPasswordTokenExpiry: 0,
+          emailVerificationToken: 0,
+          emailVerificationExpiry: 0,
+          identificationDocument: 0,
+          identificationDocumentPublicId: 0,
+          payoutMethods: 0,
+          auctions: 0,
+        },
+      },
+
+      // --------------------------------------------------
+      // 6. Sort / paginate
+      // --------------------------------------------------
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+
+      {
+        $skip: skip,
+      },
+
+      {
+        $limit: parseInt(limit),
+      },
+    ]);
+
+    const total = await User.countDocuments(filter);
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        sellers,
+        pagination: {
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(total / parseInt(limit)),
+          totalSellers: total,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Get sellers error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error while fetching sellers",
+    });
+  }
+};
+
+export const getUserPublic = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // --------------------------------------------------
+    // Fetch public seller information
+    // --------------------------------------------------
+
+    const user = await User.findById(userId)
+      .select(
+        '-password ' +
+        '-refreshToken ' +
+        '-resetPasswordToken ' +
+        '-emailVerificationToken ' +
+        '-payoutMethods ' +
+        '-identificationDocument'
+      )
+      .lean();
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    // --------------------------------------------------
+    // Calculate seller statistics
+    // --------------------------------------------------
+
+    const stats = await Auction.aggregate([
+      {
+        $match: {
+          seller: user._id,
+        },
+      },
+
+      {
+        $group: {
+          _id: null,
+
+          // All listings except drafts
+          listed: {
+            $sum: {
+              $cond: [
+                { $ne: ['$status', 'draft'] },
+                1,
+                0,
+              ],
+            },
+          },
+
+          // Currently active listings
+          active: {
+            $sum: {
+              $cond: [
+                { $eq: ['$status', 'active'] },
+                1,
+                0,
+              ],
+            },
+          },
+
+          // Successfully sold listings
+          sold: {
+            $sum: {
+              $cond: [
+                {
+                  $in: [
+                    '$status',
+                    ['sold', 'sold_buy_now'],
+                  ],
+                },
+                1,
+                0,
+              ],
+            },
+          },
+
+          // Completed listings
+          completed: {
+            $sum: {
+              $cond: [
+                {
+                  $in: [
+                    '$status',
+                    [
+                      'sold',
+                      'sold_buy_now',
+                      'ended',
+                      'reserve_not_met',
+                    ],
+                  ],
+                },
+                1,
+                0,
+              ],
+            },
+          },
+
+          // Total bids received across all listings
+          totalBids: {
+            $sum: {
+              $ifNull: ['$bidCount', 0],
+            },
+          },
+        },
+      },
+
+      {
+        $project: {
+          _id: 0,
+          listed: 1,
+          active: 1,
+          sold: 1,
+          completed: 1,
+          totalBids: 1,
+
+          successRate: {
+            $cond: [
+              { $gt: ['$completed', 0] },
+              {
+                $round: [
+                  {
+                    $multiply: [
+                      {
+                        $divide: [
+                          '$sold',
+                          '$completed',
+                        ],
+                      },
+                      100,
+                    ],
+                  },
+                  0,
+                ],
+              },
+              0,
+            ],
+          },
+        },
+      },
+    ]);
+
+    // --------------------------------------------------
+    // Default stats when seller has no listings
+    // --------------------------------------------------
+
+    const sellerStats = stats[0] || {
+      listed: 0,
+      active: 0,
+      sold: 0,
+      completed: 0,
+      totalBids: 0,
+      successRate: 0,
+    };
+
+    // --------------------------------------------------
+    // Attach stats to user
+    // --------------------------------------------------
+
+    user.stats = {
+      listed: sellerStats.listed || 0,
+      active: sellerStats.active || 0,
+      sold: sellerStats.sold || 0,
+      completed: sellerStats.completed || 0,
+      successRate: sellerStats.successRate || 0,
+      totalBids: sellerStats.totalBids || 0,
+    };
+
+    // --------------------------------------------------
+    // Response
+    // --------------------------------------------------
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        user,
+      },
+    });
+
+  } catch (error) {
+    console.error('Get public user error:', error);
+
+    return res.status(500).json({
+      success: false,
+      message: 'Server error',
     });
   }
 };

@@ -376,6 +376,7 @@ export const getAuctions = async (req, res) => {
       priceMin,
       priceMax,
       location,
+      seller,
     } = req.query;
 
     // Build filter object
@@ -386,6 +387,10 @@ export const getAuctions = async (req, res) => {
       filter.status = status;
     } else {
       filter.status = { $ne: "draft" };
+    }
+
+    if (seller) {
+      filter.seller = seller;
     }
 
     // ========== CATEGORY FILTERING - UPDATED ==========
