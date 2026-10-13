@@ -22,6 +22,73 @@ import {
 } from "../utils/nodemailer.js";
 import Payment from "../models/payment.model.js";
 
+// ============================================================
+// REUSABLE — cleans up everything belonging to a user, then deletes
+// Returns { ok, reason?, data? }
+// ============================================================
+const cleanupAndDeleteUser = async (userId, adminId) => {
+  const user = await User.findById(userId);
+  if (!user) return { ok: false, reason: "Not found" };
+  if (user._id.toString() === adminId.toString()) {
+    return { ok: false, reason: "Cannot delete your own account" };
+  }
+
+  // 1. Cancel all auctions owned by this user
+  const userAuctions = await Auction.find({ seller: userId });
+  for (const auction of userAuctions) {
+    auction.status = "cancelled";
+    await agendaService.cancelAuctionJobs(auction._id);
+    await auction.save();
+  }
+
+  // 2. Strip their bids from all active auctions & recompute highest
+  const auctionsWithUserBids = await Auction.find({
+    "bids.bidder": userId,
+    status: "active",
+  });
+  for (const auction of auctionsWithUserBids) {
+    auction.bids = auction.bids.filter(
+      (bid) => bid.bidder.toString() !== userId.toString()
+    );
+    auction.bidCount = auction.bids.length;
+
+    if (auction.bids.length > 0) {
+      const sorted = auction.bids.sort((a, b) => b.amount - a.amount);
+      auction.currentBidder = sorted[0].bidder;
+      auction.currentPrice = sorted[0].amount;
+    } else {
+      auction.currentBidder = null;
+      auction.currentPrice = auction.startPrice;
+    }
+    await auction.save();
+  }
+
+  // 3. Soft-delete their comments
+  await Comment.updateMany(
+    { user: userId },
+    {
+      status: "deleted",
+      deletedAt: new Date(),
+      deletedBy: adminId,
+      adminDeleteReason: "User account deleted by admin",
+    }
+  );
+
+  // 4. Remove their watchlist items
+  await Watchlist.deleteMany({ user: userId });
+
+  // 5. Delete the user
+  await User.findByIdAndDelete(userId);
+
+  return {
+    ok: true,
+    data: {
+      cancelledAuctions: userAuctions.length,
+      updatedAuctions: auctionsWithUserBids.length,
+    },
+  };
+};
+
 export const getAdminStats = async (req, res) => {
   try {
     // ---- Shared user metrics ----
@@ -621,101 +688,24 @@ export const updateUserStatus = async (req, res) => {
 export const deleteUser = async (req, res) => {
   try {
     const { userId } = req.params;
+    const result = await cleanupAndDeleteUser(userId, req.user._id);
 
-    // Check if user exists
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+    if (!result.ok) {
+      return res
+        .status(result.reason === "Not found" ? 404 : 400)
+        .json({ success: false, message: result.reason });
     }
 
-    // Prevent admin from deleting themselves
-    if (user._id.toString() === req.user._id.toString()) {
-      return res.status(400).json({
-        success: false,
-        message: "Cannot delete your own account",
-      });
-    }
-
-    // 1. Cancel all auctions created by this user
-    const userAuctions = await Auction.find({ seller: userId });
-
-    for (const auction of userAuctions) {
-      // Cancel the auction
-      auction.status = "cancelled";
-
-      // Cancel agenda jobs for this auction
-      await agendaService.cancelAuctionJobs(auction._id);
-
-      await auction.save();
-    }
-
-    // 2. Remove user's bids from all auctions and update current highest bidder
-    const auctionsWithUserBids = await Auction.find({
-      "bids.bidder": userId,
-      status: "active", // Only update active auctions
-    });
-
-    for (const auction of auctionsWithUserBids) {
-      // Remove all bids by this user
-      auction.bids = auction.bids.filter(
-        (bid) => bid.bidder.toString() !== userId.toString(),
-      );
-
-      // Update bid count
-      auction.bidCount = auction.bids.length;
-
-      // Find the new highest bidder
-      if (auction.bids.length > 0) {
-        // Sort bids by amount descending and get the highest
-        const sortedBids = auction.bids.sort((a, b) => b.amount - a.amount);
-        const highestBid = sortedBids[0];
-
-        auction.currentBidder = highestBid.bidder;
-        auction.currentPrice = highestBid.amount;
-      } else {
-        // No bids left, reset to start price
-        auction.currentBidder = null;
-        auction.currentPrice = auction.startPrice;
-      }
-
-      await auction.save();
-    }
-
-    // 3. Delete user's comments (soft delete by marking as deleted)
-    await Comment.updateMany(
-      { user: userId },
-      {
-        status: "deleted",
-        deletedAt: new Date(),
-        deletedBy: req.user._id,
-        adminDeleteReason: "User account deleted by admin",
-      },
-    );
-
-    // 4. Remove user's watchlist items
-    await Watchlist.deleteMany({ user: userId });
-
-    // 5. Finally delete the user
-    await User.findByIdAndDelete(userId);
-
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      message:
-        "User deleted successfully. All related data has been cleaned up.",
-      data: {
-        cancelledAuctions: userAuctions.length,
-        updatedAuctions: auctionsWithUserBids.length,
-      },
+      message: "User deleted successfully. All related data has been cleaned up.",
+      data: result.data,
     });
   } catch (error) {
     console.error("Delete user error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error while deleting user",
-    });
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error while deleting user" });
   }
 };
 
@@ -2304,5 +2294,271 @@ export const verifyUser = async (req, res) => {
       success: false,
       message: "Internal server error",
     });
+  }
+};
+
+// ============================================================
+// BULK AUCTION / PRODUCT ACTIONS
+// action: approve | cancel | activate | end | delete
+// ============================================================
+export const bulkAuctionAction = async (req, res) => {
+  try {
+    const { ids, action } = req.body;
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ success: false, message: "No items selected" });
+    }
+    if (!["approve", "cancel", "activate", "end", "delete"].includes(action)) {
+      return res.status(400).json({ success: false, message: "Invalid bulk action" });
+    }
+
+    const results = { done: [], skipped: [], failed: [] };
+    const now = new Date();
+
+    for (const id of ids) {
+      try {
+        const auction = await Auction.findById(id).populate("seller");
+        if (!auction) {
+          results.failed.push({ id, reason: "Not found" });
+          continue;
+        }
+
+        switch (action) {
+          // ---------------- APPROVE ----------------
+          case "approve": {
+            if (auction.status !== "draft") {
+              results.skipped.push({ id, reason: `Status is ${auction.status}` });
+              break;
+            }
+
+            const isProduct = auction.auctionType === "buy_now";
+
+            if (isProduct) {
+              auction.status = "active";
+              auctionListedEmail(auction, auction.seller).catch((err) =>
+                console.error("auctionListedEmail error:", err)
+              );
+            } else if (auction.startDate > now) {
+              auction.status = "approved";
+              await agendaService.scheduleAuctionActivation(
+                auction._id,
+                auction.startDate
+              );
+              auctionApprovedEmail(auction.seller, auction).catch((err) =>
+                console.error("auctionApprovedEmail error:", err)
+              );
+            } else {
+              auction.status = "active";
+              auctionListedEmail(auction, auction.seller).catch((err) =>
+                console.error("auctionListedEmail error:", err)
+              );
+              if (auction.endDate && auction.endDate <= now) {
+                await auction.endAuction();
+              }
+            }
+
+            await auction.save();
+            results.done.push(id);
+
+            // fire-and-forget bidder bulk notifications for auctions only
+            if (!isProduct) {
+              setImmediate(async () => {
+                try {
+                  const bidders = await User.find({
+                    _id: { $ne: auction?.seller?._id },
+                    userType: { $ne: "admin" },
+                    isActive: true,
+                  }).select(
+                    "email username companyName firstName lastName preferences userType currency"
+                  );
+                  if (bidders.length > 0) {
+                    await sendBulkAuctionNotifications(bidders, auction, auction.seller);
+                  }
+                } catch (err) {
+                  console.error("Bulk auction notification error:", err);
+                }
+              });
+            }
+            break;
+          }
+
+          // ---------------- CANCEL ----------------
+          case "cancel": {
+            if (auction.status !== "active") {
+              results.skipped.push({ id, reason: `Cannot cancel a ${auction.status}` });
+              break;
+            }
+            auction.status = "cancelled";
+            await agendaService.cancelAuctionJobs(auction._id);
+            await auction.save();
+            results.done.push(id);
+            break;
+          }
+
+          // ---------------- ACTIVATE ----------------
+          case "activate": {
+            if (auction.status !== "cancelled") {
+              results.skipped.push({ id, reason: `Cannot activate a ${auction.status}` });
+              break;
+            }
+            auction.status = "active";
+            // Reschedule end job if it's a timed auction with a future end
+            if (
+              (auction.auctionType === "standard" || auction.auctionType === "reserve") &&
+              auction.endDate &&
+              auction.endDate > now
+            ) {
+              await agendaService.scheduleAuctionEnd(auction._id, auction.endDate);
+            }
+            await auction.save();
+            results.done.push(id);
+            break;
+          }
+
+          // ---------------- END NOW ----------------
+          case "end": {
+            if (auction.status !== "active") {
+              results.skipped.push({ id, reason: `Cannot end a ${auction.status}` });
+              break;
+            }
+            await auction.endAuction();
+            results.done.push(id);
+            break;
+          }
+
+          // ---------------- DELETE ----------------
+          case "delete": {
+            // Mirror the single-delete guard
+            if (auction.status === "active" && auction.bidCount > 0) {
+              results.skipped.push({
+                id,
+                reason: "Active auction with bids — cancel it first",
+              });
+              break;
+            }
+            await Auction.findByIdAndDelete(id);
+            results.done.push(id);
+            break;
+          }
+        }
+      } catch (err) {
+        console.error(`Bulk ${action} error for ${id}:`, err);
+        results.failed.push({ id, reason: err.message });
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `${results.done.length} succeeded, ${results.skipped.length} skipped, ${results.failed.length} failed`,
+      data: results,
+    });
+  } catch (error) {
+    console.error("Bulk auction action error:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
+
+// ============================================================
+// BULK USER ACTIONS
+// action: verify-id | activate | deactivate | delete
+// ============================================================
+export const bulkUserAction = async (req, res) => {
+  try {
+    const { userIds, action } = req.body;
+
+    if (!Array.isArray(userIds) || userIds.length === 0) {
+      return res.status(400).json({ success: false, message: "No users selected" });
+    }
+    if (!["verify-id", "activate", "deactivate", "delete"].includes(action)) {
+      return res.status(400).json({ success: false, message: "Invalid bulk action" });
+    }
+
+    const results = { done: [], skipped: [], failed: [] };
+
+    for (const id of userIds) {
+      try {
+        // ---------------- DELETE (uses reusable helper) ----------------
+        if (action === "delete") {
+          const r = await cleanupAndDeleteUser(id, req.user._id);
+          if (r.ok) results.done.push(id);
+          else results.skipped.push({ id, reason: r.reason });
+          continue;
+        }
+
+        const user = await User.findById(id);
+        if (!user) {
+          results.failed.push({ id, reason: "Not found" });
+          continue;
+        }
+
+        switch (action) {
+          // ---------------- VERIFY ID ----------------
+          case "verify-id": {
+            if (!user.identificationDocument) {
+              results.skipped.push({ id, reason: "No ID document uploaded" });
+              break;
+            }
+            if (user.identificationStatus === "verified") {
+              results.skipped.push({ id, reason: "Already verified" });
+              break;
+            }
+            user.identificationStatus = "verified";
+            user.identificationVerifiedAt = new Date();
+            user.identificationRejectionReason = null;
+            user.isVerified = true;
+            await user.save();
+            accountApprovedEmail(user).catch((err) =>
+              console.error("accountApprovedEmail error:", err)
+            );
+            results.done.push(id);
+            break;
+          }
+
+          // ---------------- ACTIVATE ----------------
+          case "activate": {
+            if (user.isActive) {
+              results.skipped.push({ id, reason: "Already active" });
+              break;
+            }
+            user.isActive = true;
+            await user.save();
+            results.done.push(id);
+            break;
+          }
+
+          // ---------------- DEACTIVATE ----------------
+          case "deactivate": {
+            if (!user.isActive) {
+              results.skipped.push({ id, reason: "Already inactive" });
+              break;
+            }
+            if (user._id.toString() === req.user._id.toString()) {
+              results.skipped.push({ id, reason: "Cannot deactivate yourself" });
+              break;
+            }
+            user.isActive = false;
+            await user.save();
+            results.done.push(id);
+            break;
+          }
+        }
+      } catch (err) {
+        console.error(`Bulk user ${action} error for ${id}:`, err);
+        results.failed.push({ id, reason: err.message });
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `${results.done.length} succeeded, ${results.skipped.length} skipped, ${results.failed.length} failed`,
+      data: results,
+    });
+  } catch (error) {
+    console.error("Bulk user action error:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 };

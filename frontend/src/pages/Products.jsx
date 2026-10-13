@@ -392,10 +392,10 @@ function Products() {
                 <div className="bg-white border-b border-gray-200 px-8 py-8">
                     <div className="container mx-auto">
                         <h2 className="text-4xl font-black tracking-[-0.04em] text-gray-950 md:text-5xl">
-                            All
-                            <span className="ml-2 font-medium italic text-gray-400">
+                            Market
+                            {/* <span className="ml-2 font-medium italic text-gray-400">
                                 Products.
-                            </span>
+                            </span> */}
                         </h2>
                         <p className="text-gray-600 mt-2">
                             Browse our selection of premium products. Buy now, instantly.

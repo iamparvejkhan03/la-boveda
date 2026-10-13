@@ -22,7 +22,7 @@ const navLinks = [
         href: '/sellers'
     },
     {
-        name: 'Products',
+        name: 'Market',
         href: '/products'
     },
     // {

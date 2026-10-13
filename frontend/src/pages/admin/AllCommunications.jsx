@@ -98,8 +98,8 @@ const AdminCommunications = () => {
                                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
                                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Seller</th>
                                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Winner</th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Final Price</th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Activity</th>
+                                                {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Final Price</th> */}
+                                                {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Activity</th> */}
                                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                                             </tr>
                                         </thead>
@@ -107,7 +107,7 @@ const AdminCommunications = () => {
                                             {filtered.map((comm) => (
                                                 <tr key={comm._id} className="hover:bg-gray-50 transition">
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm font-medium text-gray-900">{comm.auction?.title || "N/A"}</div>
+                                                        <div className="text-sm truncate w-60 font-medium text-gray-900">{comm.auction?.title || "N/A"}</div>
                                                         <div className="text-xs text-gray-500">{comm?.auction?.category || ""}</div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
@@ -122,17 +122,17 @@ const AdminCommunications = () => {
                                                             <span className="text-sm">{comm?.winningBidder?.username || "Unknown"}</span>
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                    {/* <td className="px-6 py-4 whitespace-nowrap">
                                                         <span className="text-sm font-semibold text-gray-900">
                                                             ${comm?.auction?.finalPrice?.toLocaleString() || "0"}
                                                         </span>
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    </td> */}
+                                                    {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                         <div className="flex items-center">
                                                             <Calendar size={14} className="mr-1" />
                                                             {format(new Date(comm?.lastMessageAt), "MMM d, h:mm a")}
                                                         </div>
-                                                    </td>
+                                                    </td> */}
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <Link
                                                             to={`/admin/communication/${comm?.auction?._id}`}

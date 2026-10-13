@@ -299,7 +299,7 @@ function SoldAuctions() {
                                                 <div>
                                                     <div className="text-sm text-gray-500">Final Bid</div>
                                                     <div className="font-medium text-green-600">{formatCurrency(selectedAuction.winningBid)}</div>
-                                                </div>{console.log(selectedAuction)}
+                                                </div>
                                             </div>
                                             {selectedAuction?.paymentStatus && <div className="flex flex-wrap gap-4 mt-3">
                                                 <div>

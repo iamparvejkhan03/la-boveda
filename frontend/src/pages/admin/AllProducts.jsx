@@ -16,6 +16,8 @@ function AllProducts() {
     const [activeDropdown, setActiveDropdown] = useState(null);
     const navigate = useNavigate();
     const [stats, setStats] = useState({ total: 0, active: 0, pending: 0, sold: 0 });
+    const [selectedIds, setSelectedIds] = useState(new Set());
+    const [bulkRunning, setBulkRunning] = useState(false);
     const [pagination, setPagination] = useState({
         currentPage: 1, totalPages: 1, totalAuctions: 0, hasNext: false, hasPrev: false
     });
@@ -153,6 +155,77 @@ function AllProducts() {
         return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     };
 
+    const selectedProducts = products.filter((a) => selectedIds.has(a._id));
+
+    // --- Selection ---
+    const toggleSelect = (id) => {
+        setSelectedIds((prev) => {
+            const next = new Set(prev);
+            next.has(id) ? next.delete(id) : next.add(id);
+            return next;
+        });
+    };
+
+    const toggleSelectAll = () => {
+        setSelectedIds((prev) =>
+            prev.size === products.length ? new Set() : new Set(products.map((p) => p._id))
+        );
+    };
+
+    const clearSelection = () => setSelectedIds(new Set());
+
+    // --- Which actions are possible for the current selection? ---
+    const hasDrafts = selectedProducts.some((a) => a.status === "draft");
+    const hasActive = selectedProducts.some((a) => a.status === "active");
+    const hasCancelled = selectedProducts.some((a) => a.status === "cancelled");
+    // Deletable: anything that is NOT an active-with-bids auction
+    const hasDeletable = selectedProducts.some(
+        (a) => !(a.status === "active" && a.bidCount > 0)
+    );
+
+    // --- Single entry point for all bulk actions ---
+    const runBulkAction = async (action) => {
+        if (selectedIds.size === 0) return;
+
+        const labels = {
+            approve: "Approve",
+            cancel: "Cancel",
+            activate: "Activate",
+            // end: "End now",
+            delete: "Delete",
+        };
+
+        if (
+            !window.confirm(
+                `${labels[action]} ${selectedIds.size} item(s)? This cannot be undone.`
+            )
+        )
+            return;
+
+        setBulkRunning(true);
+        try {
+            const { data } = await toast.promise(
+                axiosInstance.patch("/api/v1/admin/auctions/bulk", {
+                    ids: Array.from(selectedIds),
+                    action,
+                }),
+                {
+                    loading: `${labels[action]}ing ${selectedIds.size} item(s)…`,
+                    success: (res) => res.data.message,
+                    error: "Bulk action failed",
+                }
+            );
+            if (data.success) {
+                clearSelection();
+                fetchProducts();
+            }
+        } catch (err) {
+            console.error(`Bulk ${action} error:`, err);
+        } finally {
+            setBulkRunning(false);
+        }
+    };
+
     return (
         <section className="flex min-h-screen bg-gray-50">
             <AdminSidebar />
@@ -162,7 +235,7 @@ function AllProducts() {
                     <div className="max-w-full pt-16 pb-7 md:pt-0">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                             <div>
-                                <h2 className="text-3xl md:text-4xl font-bold my-5">Product Management</h2>
+                                <h2 className="text-3xl md:text-4xl font-bold my-5">Marketplace Management</h2>
                             </div>
                             <div className="mt-4 md:mt-0 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                                 <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
@@ -219,6 +292,72 @@ function AllProducts() {
                         </div>
                     </div>
 
+                    {selectedIds.size > 0 && (
+                        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 bg-[#C59D55]/10 border border-[#C59D55]/30 rounded-xl px-4 py-3">
+                            <div className="text-sm font-medium text-gray-800">
+                                <span className="font-bold">{selectedIds.size}</span> item(s) selected
+                            </div>
+
+                            <div className="flex flex-wrap gap-2">
+                                {hasDrafts && (
+                                    <button
+                                        onClick={() => runBulkAction("approve")}
+                                        disabled={bulkRunning}
+                                        className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 flex items-center gap-1"
+                                    >
+                                        <CheckCircle size={16} /> Approve
+                                    </button>
+                                )}
+
+                                {hasActive && (
+                                    <>
+                                        <button
+                                            onClick={() => runBulkAction("cancel")}
+                                            disabled={bulkRunning}
+                                            className="bg-amber-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-amber-700 disabled:opacity-50 flex items-center gap-1"
+                                        >
+                                            <AlertTriangle size={16} /> Cancel
+                                        </button>
+                                        {/* <button
+                                            onClick={() => runBulkAction("end")}
+                                            disabled={bulkRunning}
+                                            className="bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50 flex items-center gap-1"
+                                        >
+                                            <Clock size={16} /> End Now
+                                        </button> */}
+                                    </>
+                                )}
+
+                                {hasCancelled && (
+                                    <button
+                                        onClick={() => runBulkAction("activate")}
+                                        disabled={bulkRunning}
+                                        className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1"
+                                    >
+                                        <CheckCircle size={16} /> Activate
+                                    </button>
+                                )}
+
+                                {hasDeletable && (
+                                    <button
+                                        onClick={() => runBulkAction("delete")}
+                                        disabled={bulkRunning}
+                                        className="bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-800 disabled:opacity-50 flex items-center gap-1"
+                                    >
+                                        <Trash2 size={16} /> Delete
+                                    </button>
+                                )}
+
+                                <button
+                                    onClick={clearSelection}
+                                    className="bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-50"
+                                >
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-16">
                         <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
                             <h3 className="text-lg font-semibold">All Products</h3>
@@ -230,6 +369,15 @@ function AllProducts() {
                                 <table className="w-full">
                                     <thead className="bg-gray-50">
                                         <tr>
+                                            <th className="py-3 px-4 w-10">
+                                                <input
+                                                    type="checkbox"
+                                                    className="rounded border-gray-300 text-[#C59D55] focus:ring-[#C59D55] cursor-pointer"
+                                                    checked={products.length > 0 && selectedIds.size === products.length}
+                                                    onChange={toggleSelectAll}
+                                                    disabled={products.length === 0}
+                                                />
+                                            </th>
                                             <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
                                             <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
                                             <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -240,6 +388,14 @@ function AllProducts() {
                                     <tbody className="divide-y divide-gray-200">
                                         {products.map((product) => (
                                             <tr key={product._id} className="hover:bg-gray-50">
+                                                <td className="py-4 px-4">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="rounded border-gray-300 text-[#C59D55] focus:ring-[#C59D55] cursor-pointer"
+                                                        checked={selectedIds.has(product._id)}
+                                                        onChange={() => toggleSelect(product._id)}
+                                                    />
+                                                </td>
                                                 <td className="py-4 px-6">
                                                     <div className="flex items-center">
                                                         <img src={product.photos?.[0]?.url || about} alt={product.title}

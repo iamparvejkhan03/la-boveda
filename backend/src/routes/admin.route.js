@@ -17,7 +17,9 @@ import {
     fetchDVLAData,
     verifyUserIdentity,
     verifyUser,
-    rejectUserIdentity
+    rejectUserIdentity,
+    bulkAuctionAction,
+    bulkUserAction
 } from '../controllers/admin.controller.js';
 import { authAdmin } from '../middlewares/auth.middleware.js';
 import upload from '../middlewares/multer.middleware.js';
@@ -27,6 +29,7 @@ const AdminRouter = Router();
 
 AdminRouter.get('/stats', authAdmin, getAdminStats);
 AdminRouter.get('/users', authAdmin, getAllUsers);
+AdminRouter.patch('/users/bulk', authAdmin, bulkUserAction);
 AdminRouter.get('/users/:userId', authAdmin, getUserDetails);
 AdminRouter.patch('/users/:userId/status', authAdmin, updateUserStatus);
 AdminRouter.patch('/users/:userId/type', authAdmin, updateUserType);
@@ -40,6 +43,7 @@ AdminRouter.post('/dvla', authAdmin, fetchDVLAData);
 
 // Auction management routes
 AdminRouter.get('/auctions', authAdmin, getAllAuctions);
+AdminRouter.patch('/auctions/bulk', authAdmin, bulkAuctionAction);
 AdminRouter.get('/auctions/:auctionId', authAdmin, getAuctionDetails);
 AdminRouter.patch('/auctions/:auctionId/status', authAdmin, updateAuctionStatus);
 AdminRouter.patch('/auctions/:auctionId/approve', authAdmin, approveAuction);

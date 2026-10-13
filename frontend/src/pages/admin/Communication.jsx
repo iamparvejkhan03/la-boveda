@@ -26,6 +26,7 @@ const CommunicationDetail = () => {
     const [updatingShipping, setUpdatingShipping] = useState(false);
     const fileInputRef = useRef(null);
     const messagesEndRef = useRef(null);
+    const textareaRef = useRef(null);
 
     useEffect(() => {
         if (!auctionId || auctionId === "undefined") {
@@ -147,6 +148,10 @@ const CommunicationDetail = () => {
                             setNewMessage("");
                             setAttachments([]);
                             if (fileInputRef.current) fileInputRef.current.value = "";
+                            if (textareaRef.current) {
+                                textareaRef.current.style.height = "auto";
+                                textareaRef.current.focus();
+                            }
                             return `Message sent to ${activeTab === "seller" ? "Seller" : "Buyer"} successfully!`;
                         } else {
                             throw new Error("Failed to send message");
@@ -163,6 +168,17 @@ const CommunicationDetail = () => {
         } finally {
             setSending(false);
         }
+    };
+
+    const handleKeyDown = (e) => {
+        // Enter alone → send
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            if (!sending && (newMessage.trim() || attachments.length > 0)) {
+                handleSendMessage(e);
+            }
+        }
+        // Shift+Enter → default behaviour (inserts \n)
     };
 
     const handleFileChange = (e) => {
@@ -326,7 +342,9 @@ const CommunicationDetail = () => {
                                                                 {format(new Date(msg.createdAt), "MMM d, h:mm a")}
                                                             </span>
                                                         </div>
-                                                        {msg.content && <p className="text-sm break-words">{msg.content}</p>}
+                                                        {msg.content && (
+                                                            <p className="text-sm break-words whitespace-pre-wrap">{msg.content}</p>
+                                                        )}
                                                         {msg.attachments.length > 0 && (
                                                             <div className="mt-2 space-y-1">
                                                                 {msg.attachments.map((att, i) => (
@@ -356,13 +374,20 @@ const CommunicationDetail = () => {
                                     onSubmit={handleSendMessage}
                                     className="border-t border-gray-200 p-4 bg-gray-50 rounded-b-xl"
                                 >
-                                    <div className="flex items-center flex-wrap gap-2">
-                                        <input
-                                            type="text"
-                                            placeholder={`Send message to ${activeTab === "seller" ? "Seller" : "Buyer"}...`}
-                                            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#C59D55] focus:border-transparent"
+                                    <div className="flex items-end flex-wrap gap-2">
+                                        <textarea
+                                            ref={textareaRef}
+                                            rows={1}
+                                            placeholder={`Send message to ${activeTab === "seller" ? "Seller" : "Buyer"}... (Shift+Enter for a new line)`}
+                                            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#C59D55] focus:border-transparent resize-none max-h-40 overflow-y-auto"
                                             value={newMessage}
-                                            onChange={(e) => setNewMessage(e.target.value)}
+                                            onChange={(e) => {
+                                                setNewMessage(e.target.value);
+                                                // Auto-grow up to 160px
+                                                e.target.style.height = "auto";
+                                                e.target.style.height = Math.min(e.target.scrollHeight, 160) + "px";
+                                            }}
+                                            onKeyDown={handleKeyDown}
                                             disabled={sending}
                                         />
                                         <button

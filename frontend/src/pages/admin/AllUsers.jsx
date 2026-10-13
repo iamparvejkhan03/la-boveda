@@ -13,6 +13,8 @@ function AllUsers() {
     const [selectedUser, setSelectedUser] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState(null);
+    const [selectedIds, setSelectedIds] = useState(new Set());
+    const [bulkRunning, setBulkRunning] = useState(false);
     const [stats, setStats] = useState({
         total: 0,
         admins: 0,
@@ -325,6 +327,74 @@ function AllUsers() {
         };
     }, []);
 
+    const selectedUsers = users.filter((u) => selectedIds.has(u._id));
+
+    const toggleSelect = (id) => {
+        setSelectedIds((prev) => {
+            const next = new Set(prev);
+            next.has(id) ? next.delete(id) : next.add(id);
+            return next;
+        });
+    };
+
+    const toggleSelectAll = () => {
+        setSelectedIds((prev) =>
+            prev.size === users.length ? new Set() : new Set(users.map((u) => u._id))
+        );
+    };
+
+    const clearSelection = () => setSelectedIds(new Set());
+
+    // Which actions apply to the current selection?
+    const hasVerifiableId = selectedUsers.some(
+        (u) => u.identificationDocument && u.identificationStatus === "pending"
+    );
+    const hasInactive = selectedUsers.some((u) => !u.isActive);
+    const hasActive = selectedUsers.some((u) => u.isActive);
+    const hasDeletable = selectedUsers.length > 0; // backend blocks self-delete
+
+    const runBulkAction = async (action) => {
+        if (selectedIds.size === 0) return;
+
+        const labels = {
+            "verify-id": "Verify ID for",
+            activate: "Activate",
+            deactivate: "Deactivate",
+            delete: "Delete",
+        };
+
+        if (
+            !window.confirm(
+                `${labels[action]} ${selectedIds.size} user(s)? ${action === "delete" ? "This cannot be undone." : ""
+                }`
+            )
+        )
+            return;
+
+        setBulkRunning(true);
+        try {
+            const { data } = await toast.promise(
+                axiosInstance.patch("/api/v1/admin/users/bulk", {
+                    userIds: Array.from(selectedIds),
+                    action,
+                }),
+                {
+                    loading: `Processing ${selectedIds.size} user(s)…`,
+                    success: (res) => res.data.message,
+                    error: "Bulk action failed",
+                }
+            );
+            if (data.success) {
+                clearSelection();
+                fetchUsers();
+            }
+        } catch (err) {
+            console.error(`Bulk user ${action} error:`, err);
+        } finally {
+            setBulkRunning(false);
+        }
+    };
+
     return (
         <section className="flex min-h-screen bg-gray-50">
             <AdminSidebar />
@@ -403,6 +473,63 @@ function AllUsers() {
                         </div>
                     </div>
 
+                    {selectedIds.size > 0 && (
+                        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 bg-[#C59D55]/10 border border-[#C59D55]/30 rounded-xl px-4 py-3">
+                            <div className="text-sm font-medium text-gray-800">
+                                <span className="font-bold">{selectedIds.size}</span> user(s) selected
+                            </div>
+
+                            <div className="flex flex-wrap gap-2">
+                                {hasVerifiableId && (
+                                    <button
+                                        onClick={() => runBulkAction("verify-id")}
+                                        disabled={bulkRunning}
+                                        className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1"
+                                    >
+                                        <Shield size={16} /> Verify IDs
+                                    </button>
+                                )}
+
+                                {hasInactive && (
+                                    <button
+                                        onClick={() => runBulkAction("activate")}
+                                        disabled={bulkRunning}
+                                        className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 flex items-center gap-1"
+                                    >
+                                        <CheckCircle size={16} /> Activate
+                                    </button>
+                                )}
+
+                                {hasActive && (
+                                    <button
+                                        onClick={() => runBulkAction("deactivate")}
+                                        disabled={bulkRunning}
+                                        className="bg-amber-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-amber-700 disabled:opacity-50 flex items-center gap-1"
+                                    >
+                                        <UserX size={16} /> Deactivate
+                                    </button>
+                                )}
+
+                                {hasDeletable && (
+                                    <button
+                                        onClick={() => runBulkAction("delete")}
+                                        disabled={bulkRunning}
+                                        className="bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-800 disabled:opacity-50 flex items-center gap-1"
+                                    >
+                                        <Trash2 size={16} /> Delete
+                                    </button>
+                                )}
+
+                                <button
+                                    onClick={clearSelection}
+                                    className="bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-50"
+                                >
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Users Table */}
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-16">
                         <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
@@ -418,6 +545,15 @@ function AllUsers() {
                                 <table className="w-full">
                                     <thead className="bg-gray-50">
                                         <tr>
+                                            <th className="py-3 px-4 w-10">
+                                                <input
+                                                    type="checkbox"
+                                                    className="rounded border-gray-300 text-[#C59D55] focus:ring-[#C59D55] cursor-pointer"
+                                                    checked={users.length > 0 && selectedIds.size === users.length}
+                                                    onChange={toggleSelectAll}
+                                                    disabled={users.length === 0}
+                                                />
+                                            </th>
                                             <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
                                             <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                                             <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
@@ -430,6 +566,24 @@ function AllUsers() {
                                     <tbody className="divide-y divide-gray-200">
                                         {users.map((user) => (
                                             <tr key={user._id} className="hover:bg-gray-50">
+                                                <td className="py-4 px-4">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="rounded border-gray-300 text-[#C59D55] focus:ring-[#C59D55] cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                                                        checked={selectedIds.has(user._id)}
+                                                        onChange={() => toggleSelect(user._id)}
+                                                        // disabled={!isSelectable(user)}
+                                                        title={
+                                                            !user.identificationDocument
+                                                                ? 'No ID document uploaded'
+                                                                : user.identificationStatus === 'verified'
+                                                                    ? 'Already verified'
+                                                                    : user.identificationStatus === 'rejected'
+                                                                        ? 'ID was rejected'
+                                                                        : 'Select'
+                                                        }
+                                                    />
+                                                </td>
                                                 <td className="py-4 px-6">
                                                     <div className="flex items-center">
                                                         <img

@@ -14,6 +14,8 @@ function AllAuctions() {
     const [selectedAuction, setSelectedAuction] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState(null);
+    const [selectedIds, setSelectedIds] = useState(new Set());
+    const [bulkRunning, setBulkRunning] = useState(false);
     const navigate = useNavigate();
     const [stats, setStats] = useState({
         total: 0,
@@ -337,6 +339,77 @@ function AllAuctions() {
         );
     };
 
+    const selectedAuctions = auctions.filter((a) => selectedIds.has(a._id));
+
+    // --- Selection ---
+    const toggleSelect = (id) => {
+        setSelectedIds((prev) => {
+            const next = new Set(prev);
+            next.has(id) ? next.delete(id) : next.add(id);
+            return next;
+        });
+    };
+
+    const toggleSelectAll = () => {
+        setSelectedIds((prev) =>
+            prev.size === auctions.length ? new Set() : new Set(auctions.map((a) => a._id))
+        );
+    };
+
+    const clearSelection = () => setSelectedIds(new Set());
+
+    // --- Which actions are possible for the current selection? ---
+    const hasDrafts = selectedAuctions.some((a) => a.status === "draft");
+    const hasActive = selectedAuctions.some((a) => a.status === "active");
+    const hasCancelled = selectedAuctions.some((a) => a.status === "cancelled");
+    // Deletable: anything that is NOT an active-with-bids auction
+    const hasDeletable = selectedAuctions.some(
+        (a) => !(a.status === "active" && a.bidCount > 0)
+    );
+
+    // --- Single entry point for all bulk actions ---
+    const runBulkAction = async (action) => {
+        if (selectedIds.size === 0) return;
+
+        const labels = {
+            approve: "Approve",
+            cancel: "Cancel",
+            activate: "Activate",
+            end: "End now",
+            delete: "Delete",
+        };
+
+        if (
+            !window.confirm(
+                `${labels[action]} ${selectedIds.size} item(s)? This cannot be undone.`
+            )
+        )
+            return;
+
+        setBulkRunning(true);
+        try {
+            const { data } = await toast.promise(
+                axiosInstance.patch("/api/v1/admin/auctions/bulk", {
+                    ids: Array.from(selectedIds),
+                    action,
+                }),
+                {
+                    loading: `${labels[action]}ing ${selectedIds.size} item(s)…`,
+                    success: (res) => res.data.message,
+                    error: "Bulk action failed",
+                }
+            );
+            if (data.success) {
+                clearSelection();
+                fetchAuctions();
+            }
+        } catch (err) {
+            console.error(`Bulk ${action} error:`, err);
+        } finally {
+            setBulkRunning(false);
+        }
+    };
+
     return (
         <section className="flex min-h-screen bg-gray-50">
             <AdminSidebar />
@@ -427,6 +500,72 @@ function AllAuctions() {
                         </div>
                     </div>
 
+                    {selectedIds.size > 0 && (
+                        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 bg-[#C59D55]/10 border border-[#C59D55]/30 rounded-xl px-4 py-3">
+                            <div className="text-sm font-medium text-gray-800">
+                                <span className="font-bold">{selectedIds.size}</span> item(s) selected
+                            </div>
+
+                            <div className="flex flex-wrap gap-2">
+                                {hasDrafts && (
+                                    <button
+                                        onClick={() => runBulkAction("approve")}
+                                        disabled={bulkRunning}
+                                        className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 flex items-center gap-1"
+                                    >
+                                        <CheckCircle size={16} /> Approve
+                                    </button>
+                                )}
+
+                                {hasActive && (
+                                    <>
+                                        <button
+                                            onClick={() => runBulkAction("cancel")}
+                                            disabled={bulkRunning}
+                                            className="bg-amber-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-amber-700 disabled:opacity-50 flex items-center gap-1"
+                                        >
+                                            <AlertTriangle size={16} /> Cancel
+                                        </button>
+                                        <button
+                                            onClick={() => runBulkAction("end")}
+                                            disabled={bulkRunning}
+                                            className="bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50 flex items-center gap-1"
+                                        >
+                                            <Clock size={16} /> End Now
+                                        </button>
+                                    </>
+                                )}
+
+                                {hasCancelled && (
+                                    <button
+                                        onClick={() => runBulkAction("activate")}
+                                        disabled={bulkRunning}
+                                        className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1"
+                                    >
+                                        <CheckCircle size={16} /> Activate
+                                    </button>
+                                )}
+
+                                {hasDeletable && (
+                                    <button
+                                        onClick={() => runBulkAction("delete")}
+                                        disabled={bulkRunning}
+                                        className="bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-800 disabled:opacity-50 flex items-center gap-1"
+                                    >
+                                        <Trash2 size={16} /> Delete
+                                    </button>
+                                )}
+
+                                <button
+                                    onClick={clearSelection}
+                                    className="bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-50"
+                                >
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Auctions Table */}
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-16">
                         <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
@@ -442,6 +581,15 @@ function AllAuctions() {
                                 <table className="w-full">
                                     <thead className="bg-gray-50">
                                         <tr>
+                                            <th className="py-3 px-4 w-10">
+                                                <input
+                                                    type="checkbox"
+                                                    className="rounded border-gray-300 text-[#C59D55] focus:ring-[#C59D55] cursor-pointer"
+                                                    checked={auctions.length > 0 && selectedIds.size === auctions.length}
+                                                    onChange={toggleSelectAll}
+                                                    disabled={auctions.length === 0}
+                                                />
+                                            </th>
                                             <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Auction</th>
                                             {/* <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Seller</th> */}
                                             <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Bid/Offer</th>
@@ -454,6 +602,14 @@ function AllAuctions() {
                                     <tbody className="divide-y divide-gray-200">
                                         {auctions.map((auction) => (
                                             <tr key={auction._id} className="hover:bg-gray-50">
+                                                <td className="py-4 px-4">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="rounded border-gray-300 text-[#C59D55] focus:ring-[#C59D55] cursor-pointer"
+                                                        checked={selectedIds.has(auction._id)}
+                                                        onChange={() => toggleSelect(auction._id)}
+                                                    />
+                                                </td>
                                                 <td className="py-4 px-6">
                                                     <div className="flex items-center">
                                                         <img

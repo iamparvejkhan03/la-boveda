@@ -50,7 +50,7 @@ const navigation = [
         icon: <Gavel size={20} />
     },
     {
-        name: 'Products',
+        name: 'Market',
         path: '/admin/products/all',
         icon: <ShoppingBag size={20} />
     },
