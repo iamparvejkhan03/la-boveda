@@ -823,15 +823,10 @@ export const deleteIdentification = async (req, res) => {
 
 export const getSellers = async (req, res) => {
   try {
-    const {
-      page = 1,
-      limit = 12,
-      search = "",
-      location = "",
-    } = req.query;
+    const { page = 1, limit = 12, search = "", location = "" } = req.query;
 
     const filter = {
-      userType: { $in: ["seller", "broker"] },
+      userType: { $in: ["seller", "broker", "bidder"] },
       isActive: true,
     };
 
@@ -846,37 +841,22 @@ export const getSellers = async (req, res) => {
     }
 
     if (location) {
-      filter["address.city"] = {
-        $regex: location,
-        $options: "i",
-      };
+      filter["address.city"] = { $regex: location, $options: "i" };
     }
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    const sellers = await User.aggregate([
-      // --------------------------------------------------
-      // 1. Find sellers
-      // --------------------------------------------------
-      {
-        $match: filter,
-      },
+    const result = await User.aggregate([
+      // 1. Base user filter
+      { $match: filter },
 
-      // --------------------------------------------------
-      // 2. Get their auctions
-      // --------------------------------------------------
+      // 2. Lookup seller's auctions
       {
         $lookup: {
           from: "auctions",
           let: { sellerId: "$_id" },
           pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $eq: ["$seller", "$$sellerId"],
-                },
-              },
-            },
+            { $match: { $expr: { $eq: ["$seller", "$$sellerId"] } } },
             {
               $project: {
                 status: 1,
@@ -890,54 +870,38 @@ export const getSellers = async (req, res) => {
         },
       },
 
-      // --------------------------------------------------
-      // 3. Calculate seller statistics
-      // --------------------------------------------------
+      // 3. Compute stats
       {
         $addFields: {
-          // Total listings excluding drafts
           listedCount: {
             $size: {
               $filter: {
                 input: "$auctions",
                 as: "auction",
-                cond: {
-                  $ne: ["$$auction.status", "draft"],
-                },
+                cond: { $ne: ["$$auction.status", "draft"] },
               },
             },
           },
-
-          // Currently active
           activeCount: {
             $size: {
               $filter: {
                 input: "$auctions",
                 as: "auction",
-                cond: {
-                  $eq: ["$$auction.status", "active"],
-                },
+                cond: { $eq: ["$$auction.status", "active"] },
               },
             },
           },
-
-          // Successfully sold
           soldCount: {
             $size: {
               $filter: {
                 input: "$auctions",
                 as: "auction",
                 cond: {
-                  $in: [
-                    "$$auction.status",
-                    ["sold", "sold_buy_now"],
-                  ],
+                  $in: ["$$auction.status", ["sold", "sold_buy_now"]],
                 },
               },
             },
           },
-
-          // Auctions that have reached an outcome
           completedCount: {
             $size: {
               $filter: {
@@ -946,32 +910,21 @@ export const getSellers = async (req, res) => {
                 cond: {
                   $in: [
                     "$$auction.status",
-                    [
-                      "sold",
-                      "sold_buy_now",
-                      "ended",
-                      "reserve_not_met",
-                    ],
+                    ["sold", "sold_buy_now", "ended", "reserve_not_met"],
                   ],
                 },
               },
             },
           },
-
-          // Total bids received
           totalBids: {
             $sum: {
               $map: {
                 input: "$auctions",
                 as: "auction",
-                in: {
-                  $ifNull: ["$$auction.bidCount", 0],
-                },
+                in: { $ifNull: ["$$auction.bidCount", 0] },
               },
             },
           },
-
-          // Total sales value
           totalSalesValue: {
             $sum: {
               $map: {
@@ -979,18 +932,8 @@ export const getSellers = async (req, res) => {
                 as: "auction",
                 in: {
                   $cond: [
-                    {
-                      $in: [
-                        "$$auction.status",
-                        ["sold", "sold_buy_now"],
-                      ],
-                    },
-                    {
-                      $ifNull: [
-                        "$$auction.finalPrice",
-                        "$$auction.currentPrice",
-                      ],
-                    },
+                    { $in: ["$$auction.status", ["sold", "sold_buy_now"]] },
+                    { $ifNull: ["$$auction.finalPrice", "$$auction.currentPrice"] },
                     0,
                   ],
                 },
@@ -1000,9 +943,7 @@ export const getSellers = async (req, res) => {
         },
       },
 
-      // --------------------------------------------------
-      // 4. Success percentage
-      // --------------------------------------------------
+      // 4. Success rate
       {
         $addFields: {
           successRate: {
@@ -1012,12 +953,7 @@ export const getSellers = async (req, res) => {
                 $round: [
                   {
                     $multiply: [
-                      {
-                        $divide: [
-                          "$soldCount",
-                          "$completedCount",
-                        ],
-                      },
+                      { $divide: ["$soldCount", "$completedCount"] },
                       100,
                     ],
                   },
@@ -1030,9 +966,14 @@ export const getSellers = async (req, res) => {
         },
       },
 
-      // --------------------------------------------------
-      // 5. Don't expose sensitive information
-      // --------------------------------------------------
+      // ✅ 5. Only keep users with at least one published auction
+      {
+        $match: {
+          listedCount: { $gt: 0 },
+        },
+      },
+
+      // 6. Strip sensitive fields
       {
         $project: {
           password: 0,
@@ -1048,25 +989,21 @@ export const getSellers = async (req, res) => {
         },
       },
 
-      // --------------------------------------------------
-      // 6. Sort / paginate
-      // --------------------------------------------------
+      // ✅ 7. Paginate + correct total
       {
-        $sort: {
-          createdAt: -1,
+        $facet: {
+          sellers: [
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: parseInt(limit) },
+          ],
+          totalCount: [{ $count: "count" }],
         },
-      },
-
-      {
-        $skip: skip,
-      },
-
-      {
-        $limit: parseInt(limit),
       },
     ]);
 
-    const total = await User.countDocuments(filter);
+    const sellers = result[0].sellers;
+    const total = result[0].totalCount[0]?.count || 0;
 
     return res.status(200).json({
       success: true,
@@ -1081,7 +1018,6 @@ export const getSellers = async (req, res) => {
     });
   } catch (error) {
     console.error("Get sellers error:", error);
-
     return res.status(500).json({
       success: false,
       message: "Internal server error while fetching sellers",
@@ -1090,224 +1026,244 @@ export const getSellers = async (req, res) => {
 };
 
 export const getUserPublic = async (req, res) => {
-    try {
-        const { userId } = req.params;
+  try {
+    const { userId } = req.params;
 
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(400).json({ success: false, message: 'Invalid user ID' });
-        }
-
-        const user = await User.findById(userId)
-            .select(
-                '-password -refreshToken -resetPasswordToken ' +
-                '-emailVerificationToken -payoutMethods -identificationDocument'
-            )
-            .lean();
-
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
-        }
-
-        // =====================================================
-        // SINGLE AGGREGATION — auctions + products split
-        // =====================================================
-
-        const stats = await Auction.aggregate([
-            { $match: { seller: user._id } },
-            {
-                $group: {
-                    _id: null,
-
-                    // ---- AUCTIONS (excludes buy_now) ----
-                    auctionListed: {
-                        $sum: {
-                            $cond: [
-                                { $and: [
-                                    { $ne: ['$status', 'draft'] },
-                                    { $ne: ['$auctionType', 'buy_now'] },
-                                ]},
-                                1, 0,
-                            ],
-                        },
-                    },
-                    auctionActive: {
-                        $sum: {
-                            $cond: [
-                                { $and: [
-                                    { $eq: ['$status', 'active'] },
-                                    { $ne: ['$auctionType', 'buy_now'] },
-                                ]},
-                                1, 0,
-                            ],
-                        },
-                    },
-                    auctionSold: {
-                        $sum: {
-                            $cond: [
-                                { $and: [
-                                    { $in: ['$status', ['sold', 'sold_buy_now']] },
-                                    { $ne: ['$auctionType', 'buy_now'] },
-                                ]},
-                                1, 0,
-                            ],
-                        },
-                    },
-                    auctionCompleted: {
-                        $sum: {
-                            $cond: [
-                                { $and: [
-                                    { $in: ['$status', ['sold', 'sold_buy_now', 'ended', 'reserve_not_met']] },
-                                    { $ne: ['$auctionType', 'buy_now'] },
-                                ]},
-                                1, 0,
-                            ],
-                        },
-                    },
-                    auctionBids: {
-                        $sum: {
-                            $cond: [
-                                { $ne: ['$auctionType', 'buy_now'] },
-                                { $ifNull: ['$bidCount', 0] },
-                                0,
-                            ],
-                        },
-                    },
-                    auctionRevenue: {
-                        $sum: {
-                            $cond: [
-                                { $and: [
-                                    { $in: ['$status', ['sold', 'sold_buy_now']] },
-                                    { $ne: ['$auctionType', 'buy_now'] },
-                                ]},
-                                { $ifNull: ['$finalPrice', 0] },
-                                0,
-                            ],
-                        },
-                    },
-
-                    // ---- PRODUCTS (buy_now only) ----
-                    productListed: {
-                        $sum: {
-                            $cond: [
-                                { $and: [
-                                    { $ne: ['$status', 'draft'] },
-                                    { $eq: ['$auctionType', 'buy_now'] },
-                                ]},
-                                1, 0,
-                            ],
-                        },
-                    },
-                    productActive: {
-                        $sum: {
-                            $cond: [
-                                { $and: [
-                                    { $eq: ['$status', 'active'] },
-                                    { $eq: ['$auctionType', 'buy_now'] },
-                                ]},
-                                1, 0,
-                            ],
-                        },
-                    },
-                    productSold: {
-                        $sum: {
-                            $cond: [
-                                { $and: [
-                                    { $in: ['$status', ['sold', 'sold_buy_now']] },
-                                    { $eq: ['$auctionType', 'buy_now'] },
-                                ]},
-                                1, 0,
-                            ],
-                        },
-                    },
-                    productCompleted: {
-                        $sum: {
-                            $cond: [
-                                { $and: [
-                                    { $in: ['$status', ['sold', 'sold_buy_now', 'cancelled']] },
-                                    { $eq: ['$auctionType', 'buy_now'] },
-                                ]},
-                                1, 0,
-                            ],
-                        },
-                    },
-                    productRevenue: {
-                        $sum: {
-                            $cond: [
-                                { $and: [
-                                    { $in: ['$status', ['sold', 'sold_buy_now']] },
-                                    { $eq: ['$auctionType', 'buy_now'] },
-                                ]},
-                                { $ifNull: ['$finalPrice', 0] },
-                                0,
-                            ],
-                        },
-                    },
-                },
-            },
-        ]);
-
-        const s = stats[0] || {};
-
-        // =====================================================
-        // COMBINED STATS — used by SellerCard & the profile hero
-        // =====================================================
-
-        const combinedListed = (s.auctionListed || 0) + (s.productListed || 0);
-        const combinedActive = (s.auctionActive || 0) + (s.productActive || 0);
-        const combinedSold = (s.auctionSold || 0) + (s.productSold || 0);
-        const combinedCompleted = (s.auctionCompleted || 0) + (s.productCompleted || 0);
-
-        const combinedSuccessRate = combinedCompleted > 0
-            ? Math.round((combinedSold / combinedCompleted) * 100)
-            : 0;
-
-        const combinedRevenue =
-            (s.auctionRevenue || 0) + (s.productRevenue || 0);
-
-        // =====================================================
-        // ATTACH STATS
-        // =====================================================
-
-        user.stats = {
-            // Combined (top-level, backward compatible)
-            listed: combinedListed,
-            active: combinedActive,
-            sold: combinedSold,
-            completed: combinedCompleted,
-            successRate: combinedSuccessRate,
-            revenue: combinedRevenue,
-            totalBids: s.auctionBids || 0,
-
-            // SellerCard aliases (it reads listedCount / activeCount / soldCount)
-            listedCount: combinedListed,
-            activeCount: combinedActive,
-            soldCount: combinedSold,
-            completedCount: combinedCompleted,
-
-            // Split — used on the seller profile page
-            auctions: {
-                listed: s.auctionListed || 0,
-                active: s.auctionActive || 0,
-                sold: s.auctionSold || 0,
-                completed: s.auctionCompleted || 0,
-                bids: s.auctionBids || 0,
-                revenue: s.auctionRevenue || 0,
-            },
-            products: {
-                listed: s.productListed || 0,
-                active: s.productActive || 0,
-                sold: s.productSold || 0,
-                completed: s.productCompleted || 0,
-                revenue: s.productRevenue || 0,
-            },
-        };
-
-        return res.status(200).json({
-            success: true,
-            data: { user },
-        });
-    } catch (error) {
-        console.error('Get public user error:', error);
-        return res.status(500).json({ success: false, message: 'Server error' });
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ success: false, message: 'Invalid user ID' });
     }
+
+    const user = await User.findById(userId)
+      .select(
+        '-password -refreshToken -resetPasswordToken ' +
+        '-emailVerificationToken -payoutMethods -identificationDocument'
+      )
+      .lean();
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // =====================================================
+    // SINGLE AGGREGATION — auctions + products split
+    // =====================================================
+
+    const stats = await Auction.aggregate([
+      { $match: { seller: user._id } },
+      {
+        $group: {
+          _id: null,
+
+          // ---- AUCTIONS (excludes buy_now) ----
+          auctionListed: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $ne: ['$status', 'draft'] },
+                    { $ne: ['$auctionType', 'buy_now'] },
+                  ]
+                },
+                1, 0,
+              ],
+            },
+          },
+          auctionActive: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $eq: ['$status', 'active'] },
+                    { $ne: ['$auctionType', 'buy_now'] },
+                  ]
+                },
+                1, 0,
+              ],
+            },
+          },
+          auctionSold: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $in: ['$status', ['sold', 'sold_buy_now']] },
+                    { $ne: ['$auctionType', 'buy_now'] },
+                  ]
+                },
+                1, 0,
+              ],
+            },
+          },
+          auctionCompleted: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $in: ['$status', ['sold', 'sold_buy_now', 'ended', 'reserve_not_met']] },
+                    { $ne: ['$auctionType', 'buy_now'] },
+                  ]
+                },
+                1, 0,
+              ],
+            },
+          },
+          auctionBids: {
+            $sum: {
+              $cond: [
+                { $ne: ['$auctionType', 'buy_now'] },
+                { $ifNull: ['$bidCount', 0] },
+                0,
+              ],
+            },
+          },
+          auctionRevenue: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $in: ['$status', ['sold', 'sold_buy_now']] },
+                    { $ne: ['$auctionType', 'buy_now'] },
+                  ]
+                },
+                { $ifNull: ['$finalPrice', 0] },
+                0,
+              ],
+            },
+          },
+
+          // ---- PRODUCTS (buy_now only) ----
+          productListed: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $ne: ['$status', 'draft'] },
+                    { $eq: ['$auctionType', 'buy_now'] },
+                  ]
+                },
+                1, 0,
+              ],
+            },
+          },
+          productActive: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $eq: ['$status', 'active'] },
+                    { $eq: ['$auctionType', 'buy_now'] },
+                  ]
+                },
+                1, 0,
+              ],
+            },
+          },
+          productSold: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $in: ['$status', ['sold', 'sold_buy_now']] },
+                    { $eq: ['$auctionType', 'buy_now'] },
+                  ]
+                },
+                1, 0,
+              ],
+            },
+          },
+          productCompleted: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $in: ['$status', ['sold', 'sold_buy_now', 'cancelled']] },
+                    { $eq: ['$auctionType', 'buy_now'] },
+                  ]
+                },
+                1, 0,
+              ],
+            },
+          },
+          productRevenue: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $in: ['$status', ['sold', 'sold_buy_now']] },
+                    { $eq: ['$auctionType', 'buy_now'] },
+                  ]
+                },
+                { $ifNull: ['$finalPrice', 0] },
+                0,
+              ],
+            },
+          },
+        },
+      },
+    ]);
+
+    const s = stats[0] || {};
+
+    // =====================================================
+    // COMBINED STATS — used by SellerCard & the profile hero
+    // =====================================================
+
+    const combinedListed = (s.auctionListed || 0) + (s.productListed || 0);
+    const combinedActive = (s.auctionActive || 0) + (s.productActive || 0);
+    const combinedSold = (s.auctionSold || 0) + (s.productSold || 0);
+    const combinedCompleted = (s.auctionCompleted || 0) + (s.productCompleted || 0);
+
+    const combinedSuccessRate = combinedCompleted > 0
+      ? Math.round((combinedSold / combinedCompleted) * 100)
+      : 0;
+
+    const combinedRevenue =
+      (s.auctionRevenue || 0) + (s.productRevenue || 0);
+
+    // =====================================================
+    // ATTACH STATS
+    // =====================================================
+
+    user.stats = {
+      // Combined (top-level, backward compatible)
+      listed: combinedListed,
+      active: combinedActive,
+      sold: combinedSold,
+      completed: combinedCompleted,
+      successRate: combinedSuccessRate,
+      revenue: combinedRevenue,
+      totalBids: s.auctionBids || 0,
+
+      // SellerCard aliases (it reads listedCount / activeCount / soldCount)
+      listedCount: combinedListed,
+      activeCount: combinedActive,
+      soldCount: combinedSold,
+      completedCount: combinedCompleted,
+
+      // Split — used on the seller profile page
+      auctions: {
+        listed: s.auctionListed || 0,
+        active: s.auctionActive || 0,
+        sold: s.auctionSold || 0,
+        completed: s.auctionCompleted || 0,
+        bids: s.auctionBids || 0,
+        revenue: s.auctionRevenue || 0,
+      },
+      products: {
+        listed: s.productListed || 0,
+        active: s.productActive || 0,
+        sold: s.productSold || 0,
+        completed: s.productCompleted || 0,
+        revenue: s.productRevenue || 0,
+      },
+    };
+
+    return res.status(200).json({
+      success: true,
+      data: { user },
+    });
+  } catch (error) {
+    console.error('Get public user error:', error);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
 };

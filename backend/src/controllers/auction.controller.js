@@ -7,6 +7,7 @@ import {
 } from "../utils/cloudinary.js";
 import agendaService from "../services/agendaService.js";
 import {
+  auctionDeletedAdminEmail,
   auctionSubmittedForApprovalEmail,
   auctionWonAdminEmail,
   bidConfirmationEmail,
@@ -1198,60 +1199,6 @@ export const updateAuction = async (req, res) => {
   }
 };
 
-export const deleteAuction = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const seller = req.user;
-
-    const auction = await Auction.findById(id);
-
-    if (!auction) {
-      return res.status(404).json({
-        success: false,
-        message: "Auction not found",
-      });
-    }
-
-    // Check if user owns the auction
-    if (auction.seller.toString() !== seller._id.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: "You can only delete your own auctions",
-      });
-    }
-
-    // Only allow deletion of draft or cancelled auctions
-    if (!["draft", "cancelled"].includes(auction.status)) {
-      return res.status(400).json({
-        success: false,
-        message: "Only draft or cancelled auctions can be deleted",
-      });
-    }
-
-    // Delete uploaded files from cloudinary
-    for (const photo of auction.photos) {
-      await deleteFromCloudinary(photo.publicId);
-    }
-
-    for (const doc of auction.documents) {
-      await deleteFromCloudinary(doc.publicId);
-    }
-
-    await Auction.findByIdAndDelete(id);
-
-    res.status(200).json({
-      success: true,
-      message: "Auction deleted successfully",
-    });
-  } catch (error) {
-    console.error("Delete auction error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error while deleting auction",
-    });
-  }
-};
-
 // Place Bid
 
 export const placeBid = async (req, res) => {
@@ -1798,7 +1745,7 @@ export const getSoldAuctions = async (req, res) => {
       };
       if (context === "product") {
         filter.status = { $in: ["sold"] };
-      }else {
+      } else {
         filter.status = statusMap[status] || status;
       }
     }
@@ -2392,6 +2339,96 @@ export const getHotListing = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Internal server error while fetching hot listing",
+    });
+  }
+};
+
+export const deleteAuction = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const seller = req.user;
+
+    // ── 1. Fetch with populated seller so we can email it later ──
+    const auction = await Auction.findById(id).populate(
+      "seller",
+      "username firstName lastName companyName email phone countryName"
+    );
+
+    if (!auction) {
+      return res.status(404).json({ success: false, message: "Auction not found" });
+    }
+
+    if (auction.seller._id.toString() !== seller._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only delete your own auctions",
+      });
+    }
+
+    // Same safety rule as admin
+    if (auction.status === "active" && auction.bidCount > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot delete active auction with bids. Please end it first.",
+      });
+    }
+
+    if (["sold", "sold_buy_now"].includes(auction.status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Sold auctions cannot be deleted. Contact administrator.",
+      });
+    }
+
+    // ── 2. Snapshot the data BEFORE deleting ──
+    const deletedSnapshot = auction.toObject();
+
+    // Delete Cloudinary assets
+    for (const photo of auction.photos || []) {
+      if (photo.publicId) await deleteFromCloudinary(photo.publicId);
+    }
+    for (const doc of auction.documents || []) {
+      if (doc.publicId) await deleteFromCloudinary(doc.publicId);
+    }
+    for (const rec of auction.serviceRecords || []) {
+      if (rec.publicId) await deleteFromCloudinary(rec.publicId);
+    }
+
+    await Auction.findByIdAndDelete(id);
+
+    res.status(200).json({
+      success: true,
+      message: "Auction deleted successfully",
+    });
+
+    // ── 3. Notify all admins (fire-and-forget, after response) ──
+    try {
+      const adminUsers = await User.find({ userType: "admin" }).select(
+        "email firstName"
+      );
+      for (const admin of adminUsers) {
+        auctionDeletedAdminEmail(
+          admin.email,
+          deletedSnapshot,
+          deletedSnapshot.seller
+        ).catch((err) =>
+          console.error(
+            `Failed to send delete notification to ${admin.email}:`,
+            err
+          )
+        );
+      }
+      console.log(
+        `✅ Seller-deletion notifications sent to ${adminUsers.length} admin(s)`
+      );
+    } catch (adminErr) {
+      console.error("Error sending admin deletion notifications:", adminErr);
+    }
+  } catch (error) {
+    console.error("Delete auction error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error while deleting auction",
     });
   }
 };

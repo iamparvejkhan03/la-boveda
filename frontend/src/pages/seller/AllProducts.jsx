@@ -3,6 +3,7 @@ import { LoadingSpinner, SellerContainer, SellerHeader, SellerSidebar } from "..
 import { Award, BarChart3, Search, SortAsc, MoreVertical, Tag } from "lucide-react";
 import axiosInstance from "../../utils/axiosInstance";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function AllProducts() {
     const [products, setProducts] = useState([]);
@@ -120,6 +121,22 @@ function AllProducts() {
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric', month: 'short', day: 'numeric'
         });
+    };
+
+    const handleDelete = async (productId) => {
+        if (!window.confirm("Delete this product? This cannot be undone.")) return;
+        try {
+            const { data } = await axiosInstance.delete(
+                `/api/v1/auctions/delete/${productId}`
+            );
+            if (data.success) {
+                setProducts((prev) => prev.filter((p) => p._id !== productId));
+                setActiveDropdown(null);
+                toast.success('Product deleted successfully!')
+            }
+        } catch (err) {
+            alert(err.response?.data?.message || "Failed to delete product");
+        }
     };
 
     return (
@@ -253,6 +270,12 @@ function AllProducts() {
                                                                             onClick={() => setActiveDropdown(null)}>
                                                                             Edit
                                                                         </Link>
+                                                                        {product.status !== "sold" && <button
+                                                                            className="px-4 py-2 text-red-600 hover:bg-red-50 transition-colors text-left"
+                                                                            onClick={() => handleDelete(product._id)}
+                                                                        >
+                                                                            Delete
+                                                                        </button>}
                                                                     </div>
                                                                 </div>
                                                             )}

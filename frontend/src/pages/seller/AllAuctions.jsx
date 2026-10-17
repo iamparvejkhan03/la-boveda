@@ -4,6 +4,7 @@ import { Gavel, Eye, Award, BarChart3, TrendingUp, DollarSign, Clock, Search, Fi
 import axiosInstance from "../../utils/axiosInstance";
 import { Link } from "react-router-dom";
 import { useRef } from "react";
+import toast from "react-hot-toast";
 
 function AllAuctions() {
     const [auctions, setAuctions] = useState([]);
@@ -31,6 +32,29 @@ function AllAuctions() {
     const handleReserveLowered = (updatedAuction) => {
         // Update your local state with the new auction data
         return;
+    };
+
+    const handleDelete = async (auctionId) => {
+        const confirmed = window.confirm(
+            "Are you sure you want to delete this auction? This action cannot be undone."
+        );
+        if (!confirmed) return;
+
+        try {
+            const { data } = await axiosInstance.delete(
+                `/api/v1/auctions/delete/${auctionId}`
+            );
+
+            if (data.success) {
+                setAuctions((prev) => prev.filter((a) => a._id !== auctionId));
+                setActiveDropdown(null);
+                toast.success('Auction deleted successfully!');
+            }
+        } catch (err) {
+            alert(
+                err.response?.data?.message || "Failed to delete auction"
+            );
+        }
     };
 
     const dropdownRef = useRef();
@@ -485,12 +509,14 @@ function AllAuctions() {
                                                                         >
                                                                             Edit
                                                                         </Link>
-                                                                        <button
-                                                                            className="px-4 py-2 text-red-600 hover:bg-red-50 transition-colors text-left"
-                                                                            onClick={() => setActiveDropdown(null)}
-                                                                        >
-                                                                            End
-                                                                        </button>
+                                                                        {["draft", "cancelled", "approved", "ended", "reserve_not_met"].includes(auction.status) && (
+                                                                            <button
+                                                                                className="px-4 py-2 text-red-600 hover:bg-red-50 transition-colors text-left"
+                                                                                onClick={() => handleDelete(auction._id)}
+                                                                            >
+                                                                                Delete
+                                                                            </button>
+                                                                        )}
                                                                     </div>
                                                                 </div>
                                                             )}

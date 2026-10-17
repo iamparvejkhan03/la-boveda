@@ -2173,6 +2173,86 @@ const identityRejectedEmail = async (user, rejectionReason, allowReupload = true
     }
 };
 
+// ============================================
+// AUCTION/PRODUCT DELETED BY SELLER — admin notification
+// ============================================
+const auctionDeletedAdminEmail = async (adminEmail, auction, seller) => {
+    try {
+        const label = getListingLabel(auction);
+        const isProduct = auction?.auctionType === 'buy_now';
+        const priceDisplay = formatCurrency(
+            isProduct ? auction?.buyNowPrice : auction?.startPrice
+        );
+
+        const content = `
+            <h2 style="text-align: center;">🗑️ ${label} Deleted by Seller</h2>
+            <p style="text-align: center;">A seller has deleted a ${label.toLowerCase()} from ${BRAND_NAME}.</p>
+
+            ${createInfoCard(`
+                <p style="margin: 0 0 12px 0;"><strong>${label} Information</strong></p>
+                ${createSummaryRow('Title:', auction?.title || 'N/A')}
+                ${auction?.subTitle ? createSummaryRow('Subtitle:', auction.subTitle) : ''}
+                ${createSummaryRow('Categories:', auction?.categories?.join(', ') || 'N/A')}
+                ${createSummaryRow('Location:', auction?.location || 'Not specified')}
+                ${createSummaryRow('Type:', label)}
+                ${createSummaryRow('Price:', priceDisplay)}
+                ${createSummaryRow('Status at Deletion:', auction?.status?.toUpperCase() || 'N/A')}
+                ${!isProduct && auction?.bidCount ? createSummaryRow('Total Bids:', auction.bidCount.toLocaleString()) : ''}
+                ${auction?.views ? createSummaryRow('Total Views:', auction.views.toLocaleString()) : ''}
+                ${createSummaryRow(`${label} ID:`, auction?._id?.toString() || 'N/A')}
+            `)}
+
+            ${auction?.specifications && (auction.specifications instanceof Map
+                ? auction.specifications.size > 0
+                : Object.keys(auction.specifications).length > 0)
+                ? `
+                    <div style="margin: 20px 0;">
+                        <strong style="color: ${BRAND_COLORS.secondary};">Item Specifications</strong>
+                        ${renderSpecifications(auction.specifications)}
+                    </div>
+                ` : ''}
+
+            <div style="background: ${BRAND_COLORS.grayBg}; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                <p style="margin: 0 0 12px 0;"><strong>Seller Information</strong></p>
+                ${createSummaryRow('Name:', `${seller?.firstName || seller?.companyName || seller?.username || ''} ${seller?.lastName || ''}`.trim() || 'N/A')}
+                ${createSummaryRow('Username:', seller?.username || seller?.companyName || 'N/A')}
+                ${createSummaryRow('Email:', seller?.email || 'N/A')}
+                ${seller?.phone ? createSummaryRow('Phone:', seller.phone) : ''}
+                ${seller?.countryName ? createSummaryRow('Country:', seller.countryName) : ''}
+            </div>
+
+            <div style="background: #fef2f2; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid ${BRAND_COLORS.danger};">
+                <p style="margin: 0; color: #991b1b; font-size: 14px;">
+                    <strong>Note:</strong> This is an automated notification. All associated files (photos, documents, service records) have been removed from Cloudinary.
+                </p>
+            </div>
+
+            <div style="text-align: center; margin: 25px 0;">
+                ${createButton(
+                    `View All ${label}s`,
+                    `${ADMIN_URL}/${isProduct ? 'products' : 'auctions'}/all`,
+                    'secondary'
+                )}
+            </div>
+        `;
+
+        const html = baseTemplate(content, `${label} Deleted`);
+
+        const info = await transporter.sendMail({
+            from: `"${BRAND_NAME}" <${process.env.EMAIL_USER}>`,
+            to: adminEmail,
+            subject: `${label} Deleted by Seller - ${auction?.title}`,
+            html,
+        });
+
+        console.log(`✅ ${label} deleted email sent to admin ${adminEmail} for ${auction?._id}`);
+        return !!info;
+    } catch (error) {
+        console.error(`❌ Failed to send ${label} deleted admin email:`, error);
+        return false;
+    }
+};
+
 // Export all
 export {
     contactEmail,
@@ -2216,4 +2296,5 @@ export {
     newMessageNotificationEmail,
     accountApprovedEmail,
     identityRejectedEmail,
+    auctionDeletedAdminEmail,
 };
